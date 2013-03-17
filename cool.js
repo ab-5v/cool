@@ -43,14 +43,9 @@ cool.events = {
     }
 };
 
-cool._views = {};
-cool._view = function() {};
-cool._view.prototype = {
+;(function() {
 
-    views: [],
-    models: [],
-    events: {},
-
+var init = {
     _init: function(data) {
         var that = this;
 
@@ -173,6 +168,13 @@ cool._view.prototype = {
             return that;
         });
     },
+};
+
+var proto = {
+    views: [],
+    models: [],
+    events: {},
+
 
     init: function() {},
 
@@ -196,6 +198,12 @@ cool._view.prototype = {
     }
 };
 
+
+cool._views = {};
+
+cool._view = function() {};
+cool._view.prototype = util.extend({}, init, proto);
+
 cool.view = function(name, extra) {
     extra = extra || {};
 
@@ -208,6 +216,8 @@ cool.view = function(name, extra) {
 
     return cool;
 };
+
+})();
 
 cool._models = {};
 
