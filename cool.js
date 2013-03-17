@@ -31,56 +31,148 @@ cool.util = util;
 
 cool.promise = pzero;
 
+cool.events = {
+    on: function(name, callback) {
+        $(document).on(name + '.' + this.name, callback);
+    },
+    off: function(name) {
+        $(document).off(name + '.' + this.name, callback);
+    },
+    trigger: function(name, data) {
+        $(document).trigger(name + '.' + this.name, data);
+    }
+};
+
 cool._views = {};
 cool._view = function() {};
 cool._view.prototype = {
-    _init: function(data) {
-        var that = this;
-        var promise = cool.promise();
-
-        // init models
-        var models = util.array(that.models).map(function(name) {
-            return cool.model(name).read();
-        });
-
-        cool.promise.when(models).then(function(models) {
-            that.models = {};
-            models.forEach(function(model) {
-                data[model.name] = model.data;
-                that.models[model.name] = model;
-            });
-
-            // ensure el
-            that.el = that.render(data);
-
-            // init events
-            util.keys(that.events).forEach(function(event) {
-                that.el.on(event, that[ that.events[event] ].bind(that) );
-            });
-
-            // init and append views
-            var views = util.array(that.views).map(function(name) {
-                return cool.view(name);
-            });
-
-            cool.promise.when(views).then(function(views) {
-                views.forEach(function(view) {
-                    that.append(view);
-                });
-                promise.resolve(that);
-            });
-
-            // call user init
-            that.init(data);
-        });
-
-
-        return promise;
-    },
 
     views: [],
     models: [],
     events: {},
+
+    _init: function(data) {
+        var that = this;
+
+        this.data = data;
+
+        // reorgonize events
+        this._events();
+
+        return this._models()
+            .then(this._element.bind(this))
+            .then(this._views.bind(this))
+            .then(function() {
+                that.init(that.data);
+                return that;
+            });
+    },
+
+    _events: function() {
+        var that = this;
+        var events = this.events;
+        var result = {
+            dom: {},
+            views: {},
+            models: {}
+        };
+
+        util.keys(events).forEach(function(key) {
+            var event = {};
+            var split = key.split('.');
+            var action = split.shift();
+            var instance = split.join('.');
+            var callback = that[ events[key] ].bind(that);
+
+            if (that.views.indexOf(instance) > -1) {
+
+                if (!result.views[instance]) { result.views[instance] = {}; }
+                result.views[instance][action] = callback;
+
+            } else if (that.models.indexOf(instance) > -1) {
+
+                if (!result.models[instance]) { result.models[instance] = {}; }
+                result.models[instance][action] = callback;
+
+            } else {
+                result.dom[key] = callback;
+            }
+        });
+
+        this.events = result;
+    },
+
+    _models: function() {
+        var that = this;
+        var events = this.events.models;
+        var models = this.models;
+
+        this.models = {};
+
+        // init models
+        var reads = util.array(models).map(function(name) {
+            var event = events[name];
+            var model = cool.model(name);
+            if (event) {
+                util.keys(event).forEach(function(action) {
+                    model.on(action, event[action]);
+                });
+            }
+
+            that.models[name] = model;
+
+            return model.read();
+        });
+
+        return cool.promise.when(reads).then(function(models) {
+            models.forEach(function(model) {
+                that.data[model.name] = model.data;
+            });
+        });
+
+    },
+
+    _element: function() {
+        var that = this;
+        var events = this.events.dom;
+
+        // ensure element
+        this.el = that.render(this.data);
+
+        // init events
+        util.keys(events).forEach(function(event) {
+            var split = event.split(/\s+/);
+            var type = split.shift();
+            var selector = split.join(' ');
+
+            that.el.on(type, selector, events[event]);
+        });
+
+    },
+
+    _views: function() {
+        var that = this;
+        var events = this.events.views;
+        var views = this.views;
+
+        this.views = {};
+
+        // init views
+        views = views.map(function(name) {
+            var view = cool.view(name);
+            view[name] = view;
+            return view;
+        });
+
+        // append views when they are ready
+        return cool.promise.when(views).then(function(views) {
+            views.forEach(function(view) {
+                that.append(view);
+            });
+
+            return that;
+        });
+    },
 
     init: function() {},
 
@@ -112,7 +204,7 @@ cool.view = function(name, extra) {
     }
 
     extra.name = name;
-    cool._views[ name ] = util.klass(cool._view, extra);
+    cool._views[ name ] = util.klass(cool._view, util.extend(extra, cool.events));
 
     return cool;
 };
@@ -153,7 +245,7 @@ cool.model = function(name, extra) {
     }
 
     extra.name = name;
-    cool._models[ name ] = util.klass(cool._model, extra);
+    cool._models[ name ] = util.klass(cool._model, util.extend(extra, cool.events));
 
     return cool;
 };
