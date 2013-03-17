@@ -124,7 +124,7 @@ var init = {
 
         return cool.promise.when(reads).then(function(models) {
             models.forEach(function(model) {
-                that.data[model.name] = model.data;
+                that.data[model.name] = model.data();
             });
         });
 
@@ -187,11 +187,12 @@ var proto = {
     /**
      * @param {Array|cool}
      */
-    append: function(children) {
+    append: function(children, root) {
         var that = this;
+        var el = root ? this.el.find(root) : this.el;
 
         util.array(children).forEach(function(child) {
-            that.el.append(child.el);
+            el.append(child.el);
         });
     },
 
@@ -233,6 +234,12 @@ cool._model.prototype = {
         return this;
     },
     params: {},
+    data: function(raw) {
+        return raw ? this._data : this.parse(this._data);
+    },
+    parse: function(data) {
+        return data.result;
+    },
     read: function() {
         return this.sync();
     },
@@ -243,8 +250,8 @@ cool._model.prototype = {
         $.ajax({
             url: this.url,
             dataType: 'json',
-            complete: function() {
-                that.data = [{},{},{}];
+            success: function(data) {
+                that._data = data;
                 promise.resolve(that);
                 that.trigger('read', that);
             }
