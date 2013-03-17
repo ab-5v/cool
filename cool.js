@@ -49,18 +49,21 @@ var init = {
     _init: function(data) {
         var that = this;
 
+        this.promise = cool.promise();
         this.data = data;
 
         // reorgonize events
         this._events();
 
-        return this._models()
+        this._models()
             .then(this._element.bind(this))
             .then(this._views.bind(this))
             .then(function() {
                 that.init(that.data);
                 return that;
             });
+
+        return this;
     },
 
     _events: function() {
@@ -156,7 +159,7 @@ var init = {
         views = views.map(function(name) {
             var view = cool.view(name);
             view[name] = view;
-            return view;
+            return view.promise;
         });
 
         // append views when they are ready
@@ -165,16 +168,15 @@ var init = {
                 that.append(view);
             });
 
-            return that;
+            that.promise.resolve(that);
         });
-    },
+    }
 };
 
 var proto = {
     views: [],
     models: [],
     events: {},
-
 
     init: function() {},
 
@@ -188,13 +190,16 @@ var proto = {
     append: function(children) {
         var that = this;
 
-        [].concat(children).forEach(function(child) {
+        util.array(children).forEach(function(child) {
             that.el.append(child.el);
         });
     },
 
     appendTo: function(el) {
-        $(el).append(this.el);
+        var that = this;
+        this.promise.then(function() {
+            $(el).append(that.el);
+        });
     }
 };
 
@@ -202,7 +207,7 @@ var proto = {
 cool._views = {};
 
 cool._view = function() {};
-cool._view.prototype = util.extend({}, init, proto);
+cool._view.prototype = util.extend({}, init, proto, cool.events);
 
 cool.view = function(name, extra) {
     extra = extra || {};
@@ -212,7 +217,7 @@ cool.view = function(name, extra) {
     }
 
     extra.name = name;
-    cool._views[ name ] = util.klass(cool._view, util.extend(extra, cool.events));
+    cool._views[ name ] = util.klass(cool._view, extra);
 
     return cool;
 };
