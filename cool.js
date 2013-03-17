@@ -51,6 +51,7 @@ var init = {
 
         this.promise = cool.promise();
         this.data = data;
+        this._param = {};
 
         // reorgonize events
         this._events();
@@ -158,7 +159,7 @@ var init = {
         // init views
         views = views.map(function(name) {
             var view = cool.view(name);
-            view[name] = view;
+            that.views[name] = view;
             return view.promise;
         });
 
@@ -184,6 +185,31 @@ var proto = {
         return $('<div/>').html( yr.run('main', this.data, 'cool-' + this.name) ).children();
     },
 
+    param: function(mode, name, value) {
+        var len = arguments.length;
+
+        if (len === 0) { return this._param; }
+
+        if (mode === false) {
+            if (len === 1) { this._param = {}; }
+            else if (len === 2) { delete this._param[name]; }
+            else if (len === 3 && name in this._param) {
+                this._param[name] = util.array( this._param[name] )
+                    .filter(function(val) { return val !== value; });
+            }
+        } else if (mode === true) {
+            if (len === 3) { this._param[name] = [].concat(this._param[name] || [], value); }
+        } else {
+            value = name;
+            name = mode;
+            if (len === 1) {
+                return this._param[name];
+            } else if (len === 2) {
+                this._param[name] = value;
+            }
+        }
+    },
+
     /**
      * @param {Array|cool}
      */
@@ -193,7 +219,22 @@ var proto = {
 
         util.array(children).forEach(function(child) {
             el.append(child.el);
+            child._parent = that;
         });
+    },
+
+    parent: function(name) {
+        var parent = this._parent;
+
+        if (!name) { return parent; }
+
+        while (parent) {
+            console.log(parent.name);
+            if (parent.name === name) {
+                return parent;
+            }
+            parent = parent._parent;
+        }
     },
 
     appendTo: function(el) {

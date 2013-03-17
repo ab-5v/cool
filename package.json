@@ -13,6 +13,7 @@
         "node": "*"
     },
     "devDependencies": {
+        "pzero": "*",
         "mocha": "*",
         "expect.js": "*",
         "requirer": "0.0.3",
