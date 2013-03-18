@@ -67,6 +67,19 @@ var init = {
         return this;
     },
 
+    _eventre: /^([^. ]+)(?:\.([^. ]+))?(?:\s(.*))?$/,
+    _eventinfo: function(event) {
+        var info = {};
+        var match = event.match(this._eventre);
+        if (match) {
+            if (match[1]) { info.type = match[1]; }
+            if (match[2]) { info.owner = match[2]; }
+            if (match[3]) { info.target = match[3]; }
+        }
+
+        return info;
+    },
+
     _events: function() {
         var that = this;
         var events = this.events;
@@ -163,6 +176,7 @@ var init = {
             return view.promise;
         });
 
+
         // append views when they are ready
         return cool.promise.when(views).then(function(views) {
             views.forEach(function(view) {
@@ -190,6 +204,7 @@ var proto = {
 
         if (len === 0) { return this._param; }
 
+
         if (mode === false) {
             if (len === 1) { this._param = {}; }
             else if (len === 2) { delete this._param[name]; }
@@ -207,6 +222,10 @@ var proto = {
             } else if (len === 2) {
                 this._param[name] = value;
             }
+        }
+
+        if (mode === true || mode === false || len === 2) {
+            this.trigger('param', {name: len === 3 ? name : mode});
         }
     },
 
@@ -229,7 +248,6 @@ var proto = {
         if (!name) { return parent; }
 
         while (parent) {
-            console.log(parent.name);
             if (parent.name === name) {
                 return parent;
             }
@@ -245,24 +263,48 @@ var proto = {
     }
 };
 
+var statik = {
+};
+
 
 cool._views = {};
+cool._events = {};
 
-cool._view = function() {};
-cool._view.prototype = util.extend({}, init, proto, cool.events);
 
-cool.view = function(name, extra) {
-    extra = extra || {};
+cool.view = function(desc, extra) {
 
-    if (cool._views[ name ]) {
-        return ( new cool._views[ name ]() )._init(extra);
+    // constructor call
+    if (this instanceof cool.view) { return; }
+
+    // view defenition
+    if (typeof desc === 'object') {
+
+        if (!desc.name) {
+            throw new Error('Property name is mandatory.');
+        }
+        if (cool._views[desc.name]) {
+            throw new Error('View "' + desc.name + '" is already defined.');
+        }
+
+        cool._views[ desc.name ] = util.klass(cool.view, desc);
+
+        return cool;
+
+    // view instatntiation
+    } else if (typeof desc === 'string') {
+
+        if (!cool._views[ desc ]) {
+            throw new Error('View "' + desc + '" is not defined. Use cool.view({name: \'' + desc + '\'}) to define it.');
+        }
+
+        return ( new cool._views[ desc ]() )._init(extra || {});
     }
 
-    extra.name = name;
-    cool._views[ name ] = util.klass(cool._view, extra);
-
-    return cool;
 };
+
+util.extend(cool.view.prototype, init, proto, cool.events);
+
+util.extend(cool.view, statik);
 
 })();
 
@@ -272,17 +314,27 @@ cool._model = function() {};
 
 cool._model.prototype = {
     _init: function(params) {
+        if (!this.params) {
+            this.params = params;
+        } else {
+            util.extend(this.params, params);
+        }
+
         return this;
     },
-    params: {},
     data: function(raw) {
-        return raw ? this._data : this.parse(this._data);
+        return raw ? this._data : this.process(this.parse(this._data));
     },
     parse: function(data) {
         return data.result;
     },
-    read: function() {
-        return this.sync();
+    process: function(data) {
+        return data;
+    },
+    read: function(params) {
+        return this.sync({
+            params: util.extend(this.params, params || {})
+        });
     },
     sync: function(options) {
         var that = this;
@@ -290,6 +342,8 @@ cool._model.prototype = {
 
         $.ajax({
             url: this.url,
+            traditional: true,
+            data: options.params,
             dataType: 'json',
             success: function(data) {
                 that._data = data;

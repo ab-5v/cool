@@ -63,4 +63,35 @@ describe('view', function() {
         });
 
     });
+
+    describe('_eventinfo', function() {
+
+        before(function() {
+            this.info = function(event) { return cool._view.prototype._eventinfo(event); };
+        });
+
+        it('should parse \'click\'', function() {
+            expect( this.info('click') ).to.eql( {type: 'click' } );
+        });
+
+        it('should parse \'param.someview\'', function() {
+            expect( this.info('param.someview') ).to.eql( {type: 'param', owner: 'someview' } );
+        });
+
+        it('should parse \'append.someview another\'', function() {
+            expect( this.info('append.someview another') ).to.eql( {type: 'append', owner: 'someview', target: 'another' } );
+        });
+
+        it('should parse \'submit form\'', function() {
+            expect( this.info('submit form') ).to.eql( {type: 'submit', target: 'form' } );
+        });
+
+        it('should parse \'click .b-image\'', function() {
+            expect( this.info('click .b-image') ).to.eql( {type: 'click', target: '.b-image' } );
+        });
+
+        it('should parse \'click .js-image .b-image\'', function() {
+            expect( this.info('click .js-image .b-image') ).to.eql( {type: 'click', target: '.js-image .b-image' } );
+        });
+    });
 });
