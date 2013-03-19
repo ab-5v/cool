@@ -56,14 +56,15 @@ cool.promise = pzero;
 
 cool.events = {
 
-    on: function(type, callback, context) {
+    on: function(type, callback, context, target) {
         var events = this._customevents = this._customevents || {};
 
         if (!events[type]) { events[type] = []; }
 
         events[type].push({
             callback: callback,
-            context: context || this
+            context: context || this,
+            target: target
         });
 
         return this;
@@ -81,7 +82,9 @@ cool.events = {
         }
 
         util.each(events && events[type], function(item) {
-            item.callback.call(item.context, event, data);
+            if ( !(event.target && item.target) || event.target === item.target || event.target.name === item.target ) {
+                item.callback.call(item.context, event, data);
+            }
         });
     }
 };
@@ -126,20 +129,20 @@ var init = {
     },
 
     _eventon: function(event, callback, type) {
-        console.log('_eventon', this.name, type);
+        console.log('_eventon', this.name, event);
         var that = this;
         var statik = cool[type];
         var events = statik._events;
+        var target = event.target === 'this' ? this : event.target;
 
         // future views
-        if (!events[ event.owner ]) {
-            events[ event.owner ] = [];
-        }
-        events[ event.owner ].push( {type: event.type, callback: callback, context: that} );
+        if (!events[ event.owner ]) { events[ event.owner ] = []; }
+
+        events[ event.owner ].push( {type: event.type, callback: callback, context: that, target: target} );
 
         // existing views
         util.each(statik._inst[ event.owner ], function(inst) {
-            inst.on(event.type, callback, that);
+            inst.on(event.type, callback, that, target);
         });
 
     },
@@ -282,7 +285,7 @@ var proto = {
         var el = root ? this.el.find(root) : this.el;
 
         util.array(children).forEach(function(child) {
-            that.trigger('append', {});
+            that.trigger({type: 'append', target: child}, {});
             el.append(child.el);
             child._parent = that;
         });
@@ -348,7 +351,7 @@ var statik = {
             // self binding
             util.each(this._events[ desc ], function(event) {
                 console.log('on', event.type, that.name);
-                inst.on(event.type, event.callback, event.context);
+                inst.on(event.type, event.callback, event.context, event.target);
             });
 
             return inst;
@@ -466,7 +469,7 @@ var statik = {
             // self binding
             util.each(this._events[ desc ], function(event) {
                 console.log('on', event.type, that.name);
-                inst.on(event.type, event.callback, event.context);
+                inst.on(event.type, event.callback, event.context, event.target);
             });
 
             return inst;
