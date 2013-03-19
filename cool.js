@@ -5,9 +5,6 @@ var util = {
     args: function(args, from) {
         return Array.prototype.slice.call(args, from || 0);
     },
-    isArray: function(arr) {
-        return arr instanceof Array;
-    },
     array: function(val) {
         return [].concat(val);
     },
@@ -21,6 +18,8 @@ var util = {
             util.keys(obj).forEach(function(key) {
                 callback(obj[key], key, obj);
             });
+        } else {
+            util.each(util.array(obj), callback);
         }
 
     },
@@ -32,6 +31,19 @@ var util = {
         });
         return dest;
     },
+
+    isArray: function(arr) {
+        return arr instanceof Array;
+    },
+
+    toArray: function(obj) {
+        if (!obj) {
+            return [];
+        } else {
+            return [].concat(obj);
+        }
+    },
+
     toObject: function(arr) {
         var res = {};
         arr.forEach(function(val) {
@@ -67,6 +79,25 @@ cool.events = {
             target: target
         });
 
+        return this;
+    },
+
+    off: function(type, callback, context, target) {
+        var events = this._customevents;
+        if (type) {
+            events = events && events[type];
+        } else {
+            type = events && util.keys(events);
+        }
+        if (!events) { return this; }
+
+        util.each(type, function(type) {
+            events[type] = events[type].filter(function(item) {
+                return !(context && context === item.context
+                    || target && target === item.target
+                    || callback && callback === item.callback);
+            });
+        });
         return this;
     },
 
@@ -129,13 +160,12 @@ var init = {
     },
 
     _eventon: function(event, callback, type) {
-        console.log('_eventon', this.name, event);
         var that = this;
         var statik = cool[type];
         var events = statik._events;
         var target = event.target === 'this' ? this : event.target;
 
-        // future views
+        // queue for the future events
         if (!events[ event.owner ]) { events[ event.owner ] = []; }
 
         events[ event.owner ].push( {type: event.type, callback: callback, context: that, target: target} );
@@ -170,9 +200,26 @@ var init = {
             // view events
             } else {
                 that._eventon(event, callback, 'view');
-
             }
+        });
+    },
 
+    _eventsoff: function() {
+        var that = this;
+
+        util.each(['view', 'model'], function(type) {
+            var insts = cool[type]._inst;
+            var events = cool[type]._events;
+
+            // removing events from queue
+            util.each(events, function(items, owner) {
+                events[owner] = items.filter(function(item) { return that !== item.context; });
+            });
+
+            // removing existing events
+            util.each(insts, function(items, owner) {
+                util.each(items, function(inst) { inst.off(null, null, that); });
+            });
         });
     },
 
@@ -273,7 +320,7 @@ var proto = {
         }
 
         if (mode === true || mode === false || len === 2) {
-            this.trigger('param', this);
+            this.trigger('param', {name: len === 2 ? mode : name});
         }
     },
 
@@ -284,10 +331,35 @@ var proto = {
         var that = this;
         var el = root ? this.el.find(root) : this.el;
 
+        if (!this._children) { this._children = []; }
+
         util.array(children).forEach(function(child) {
             that.trigger({type: 'append', target: child}, {});
             el.append(child.el);
             child._parent = that;
+            that._children.push(child);
+        });
+    },
+
+    detach: function(child) {
+
+        child._parent = null;
+        this._children = this._children.filter(function(item) {
+            return item !== child;
+        });
+    },
+
+    remove: function() {
+        this._eventsoff();
+        this.el.remove();
+    },
+
+    empty: function() {
+        var that = this;
+
+        util.each(this._children, function(child) {
+            that.detach(child);
+            child.remove();
         });
     },
 
@@ -350,7 +422,6 @@ var statik = {
 
             // self binding
             util.each(this._events[ desc ], function(event) {
-                console.log('on', event.type, that.name);
                 inst.on(event.type, event.callback, event.context, event.target);
             });
 
@@ -419,7 +490,7 @@ var proto = {
             success: function(data) {
                 that._data = data;
                 promise.resolve(that);
-                that.trigger('read', that);
+                that.trigger('read', that.data());
             }
         });
 
