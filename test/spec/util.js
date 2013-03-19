@@ -40,4 +40,16 @@ describe('util', function() {
         });
 
     });
+
+    describe('toObject', function() {
+
+        it('should return object on array', function() {
+            expect( util.toObject(['a', 'b']) ).to.eql( {a: 1, b: 1} );
+        });
+
+        it('should return empty object on empty array', function() {
+            expect( util.toObject([]) ).to.eql( {} );
+        });
+
+    });
 });

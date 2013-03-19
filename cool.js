@@ -5,8 +5,24 @@ var util = {
     args: function(args, from) {
         return Array.prototype.slice.call(args, from || 0);
     },
+    isArray: function(arr) {
+        return arr instanceof Array;
+    },
     array: function(val) {
         return [].concat(val);
+    },
+    each: function(obj, callback) {
+        if (!obj) { return; }
+
+        if (util.isArray(obj)) {
+            obj.forEach(callback);
+
+        } else if (typeof obj === 'object') {
+            util.keys(obj).forEach(function(key) {
+                callback(obj[key], key, obj);
+            });
+        }
+
     },
     extend: function(dest) {
         util.args(arguments, 1).forEach(function(src) {
@@ -15,6 +31,13 @@ var util = {
             });
         });
         return dest;
+    },
+    toObject: function(arr) {
+        var res = {};
+        arr.forEach(function(val) {
+            res[val] = 1;
+        });
+        return res;
     },
     klass: function(parent, extra) {
         var child = function() {};
@@ -32,14 +55,34 @@ cool.util = util;
 cool.promise = pzero;
 
 cool.events = {
-    on: function(name, callback) {
-        $(document).on(name + '.' + this.name, callback);
+
+    on: function(type, callback, context) {
+        var events = this._customevents = this._customevents || {};
+
+        if (!events[type]) { events[type] = []; }
+
+        events[type].push({
+            callback: callback,
+            context: context || this
+        });
+
+        return this;
     },
-    off: function(name) {
-        $(document).off(name + '.' + this.name, callback);
-    },
-    trigger: function(name, data) {
-        $(document).trigger(name + '.' + this.name, data);
+
+    trigger: function(type, data) {
+        var event = { owner: this };
+        var events = this._customevents;
+
+        if (typeof type === 'string') {
+            util.extend(event, {type: type});
+        } else if (typeof type === 'object') {
+            util.extend(event, type);
+            type = event.type;
+        }
+
+        util.each(events && events[type], function(item) {
+            item.callback.call(item.context, event, data);
+        });
     }
 };
 
@@ -75,62 +118,70 @@ var init = {
             if (match[1]) { info.type = match[1]; }
             if (match[2]) { info.owner = match[2]; }
             if (match[3]) { info.target = match[3]; }
+        } else {
+            throw new Error('Wrong event format "' + event + '".');
         }
 
         return info;
     },
 
-    _events: function() {
+    _eventon: function(event, callback, type) {
+        console.log('_eventon', this.name, type);
         var that = this;
-        var events = this.events;
-        var result = {
-            dom: {},
-            views: {},
-            models: {}
-        };
+        var statik = cool[type];
+        var events = statik._events;
 
-        util.keys(events).forEach(function(key) {
-            var event = {};
-            var split = key.split('.');
-            var action = split.shift();
-            var instance = split.join('.');
-            var callback = that[ events[key] ].bind(that);
+        // future views
+        if (!events[ event.owner ]) {
+            events[ event.owner ] = [];
+        }
+        events[ event.owner ].push( {type: event.type, callback: callback, context: that} );
 
-            if (that.views.indexOf(instance) > -1) {
-
-                if (!result.views[instance]) { result.views[instance] = {}; }
-                result.views[instance][action] = callback;
-
-            } else if (that.models.indexOf(instance) > -1) {
-
-                if (!result.models[instance]) { result.models[instance] = {}; }
-                result.models[instance][action] = callback;
-
-            } else {
-                result.dom[key] = callback;
-            }
+        // existing views
+        util.each(statik._inst[ event.owner ], function(inst) {
+            inst.on(event.type, callback, that);
         });
 
-        this.events = result;
+    },
+
+    _events: function() {
+        var that = this;
+        this._domevents = [];
+
+        util.each(this.events, function(callback, key) {
+            callback = that[ callback ];
+
+            var event = that._eventinfo(key);
+
+            // dom event
+            if (!event.owner) {
+                that._domevents.push({
+                    type: event.type,
+                    selector: event.target,
+                    callback: callback
+                });
+
+            // model events
+            } else if (event.type in cool.model.EVENTS) {
+                that._eventon(event, callback, 'model');
+            // view events
+            } else {
+                that._eventon(event, callback, 'view');
+
+            }
+
+        });
     },
 
     _models: function() {
         var that = this;
-        var events = this.events.models;
         var models = this.models;
 
         this.models = {};
 
         // init models
         var reads = util.array(models).map(function(name) {
-            var event = events[name];
             var model = cool.model(name);
-            if (event) {
-                util.keys(event).forEach(function(action) {
-                    model.on(action, event[action]);
-                });
-            }
-
             that.models[name] = model;
 
             return model.read();
@@ -146,25 +197,19 @@ var init = {
 
     _element: function() {
         var that = this;
-        var events = this.events.dom;
 
         // ensure element
         this.el = that.render(this.data);
 
         // init events
-        util.keys(events).forEach(function(event) {
-            var split = event.split(/\s+/);
-            var type = split.shift();
-            var selector = split.join(' ');
-
-            that.el.on(type, selector, events[event]);
+        util.each(this._domevents, function(event) {
+            that.el.on(event.type, event.selector, event.callback.bind(that));
         });
 
     },
 
     _views: function() {
         var that = this;
-        var events = this.events.views;
         var views = this.views;
 
         this.views = {};
@@ -225,7 +270,7 @@ var proto = {
         }
 
         if (mode === true || mode === false || len === 2) {
-            this.trigger('param', {name: len === 3 ? name : mode});
+            this.trigger('param', this);
         }
     },
 
@@ -237,6 +282,7 @@ var proto = {
         var el = root ? this.el.find(root) : this.el;
 
         util.array(children).forEach(function(child) {
+            that.trigger('append', {});
             el.append(child.el);
             child._parent = that;
         });
@@ -264,7 +310,12 @@ var proto = {
 };
 
 var statik = {
+    _inst: {},
+    _const: {},
+    _events: {},
+
     construct: function(desc, extra) {
+        var inst, that = this;
 
         // view defenition
         if (typeof desc === 'object') {
@@ -272,22 +323,35 @@ var statik = {
             if (!desc.name) {
                 throw new Error('Property name is mandatory.');
             }
-            if (cool._views[desc.name]) {
+            if (this._const[desc.name]) {
                 throw new Error('View "' + desc.name + '" is already defined.');
             }
 
-            cool._views[ desc.name ] = util.klass(cool.view, desc);
+            this._const[ desc.name ] = util.klass(cool.view, desc);
 
             return cool;
 
         // view instatntiation
         } else if (typeof desc === 'string') {
 
-            if (!cool._views[ desc ]) {
+            if (!this._const[ desc ]) {
                 throw new Error('View "' + desc + '" is not defined. Use cool.view({name: \'' + desc + '\'}) to define it.');
             }
 
-            return ( new cool._views[ desc ]() )._init(extra || {});
+            inst = ( new this._const[ desc ]() )._init(extra || {});
+
+            // ensure instances store
+            if (!this._inst[ desc ]) { this._inst[desc] = []; }
+
+            this._inst[desc].push( inst );
+
+            // self binding
+            util.each(this._events[ desc ], function(event) {
+                console.log('on', event.type, that.name);
+                inst.on(event.type, event.callback, event.context);
+            });
+
+            return inst;
         }
 
     }
@@ -312,11 +376,11 @@ util.extend(cool.view, statik);
 
 })();
 
+;(function() {
+
 cool._models = {};
 
-cool._model = function() {};
-
-cool._model.prototype = {
+var proto = {
     _init: function(params) {
         if (!this.params) {
             this.params = params;
@@ -360,18 +424,69 @@ cool._model.prototype = {
     }
 };
 
-cool.model = function(name, extra) {
-    extra = extra || {};
+var statik = {
 
-    if (cool._models[ name ]) {
-        return ( new cool._models[ name ]() )._init(extra);
+    EVENTS: util.toObject( ['read'] ),
+
+    _inst: {},
+    _const: {},
+    _events: {},
+
+    construct: function(desc, extra) {
+        var inst, that = this;
+
+        // model defenition
+        if (typeof desc === 'object') {
+
+            if (!desc.name) {
+                throw new Error('Property name is mandatory.');
+            }
+            if (this._const[desc.name]) {
+                throw new Error('Model "' + desc.name + '" is already defined.');
+            }
+
+            this._const[ desc.name ] = util.klass(cool.model, desc);
+
+            return cool;
+
+        // view instatntiation
+        } else if (typeof desc === 'string') {
+
+            if (!this._const[ desc ]) {
+                throw new Error('Model "' + desc + '" is not defined. Use cool.model({name: \'' + desc + '\'}) to define it.');
+            }
+
+            inst = ( new this._const[ desc ]() )._init(extra || {});
+
+            // ensure instances store
+            if (!this._inst[ desc ]) { this._inst[desc] = []; }
+
+            this._inst[desc].push( inst );
+
+            // self binding
+            util.each(this._events[ desc ], function(event) {
+                console.log('on', event.type, that.name);
+                inst.on(event.type, event.callback, event.context);
+            });
+
+            return inst;
+        }
+
     }
-
-    extra.name = name;
-    cool._models[ name ] = util.klass(cool._model, util.extend(extra, cool.events));
-
-    return cool;
 };
+
+
+cool.model = function(name, extra) {
+
+    if (this instanceof cool.model) { return; }
+
+    return cool.model.construct(name, extra);
+};
+
+util.extend(cool.model.prototype, proto, cool.events);
+util.extend(cool.model, statik);
+
+})();
 
 
 })(this, undefined);

@@ -2,7 +2,7 @@ describe('view', function() {
 
     describe('param', function() {
 
-        before(function() { cool.view('param', {render: function() {}}); });
+        before(function() { cool.view({name: 'param', render: function() {}}); });
 
         beforeEach(function() {
             this.view = cool.view('param');
@@ -67,7 +67,7 @@ describe('view', function() {
     describe('_eventinfo', function() {
 
         before(function() {
-            this.info = function(event) { return cool._view.prototype._eventinfo(event); };
+            this.info = function(event) { return cool.view.prototype._eventinfo(event); };
         });
 
         it('should parse \'click\'', function() {
