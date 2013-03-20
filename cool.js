@@ -335,6 +335,9 @@ var proto = {
 
         util.array(children).forEach(function(child) {
             that.trigger({type: 'append', target: child}, {});
+            if (child._parent) {
+                child._parent.detach(child);
+            }
             el.append(child.el);
             child._parent = that;
             that._children.push(child);
@@ -539,7 +542,6 @@ var statik = {
 
             // self binding
             util.each(this._events[ desc ], function(event) {
-                console.log('on', event.type, that.name);
                 inst.on(event.type, event.callback, event.context, event.target);
             });
 
