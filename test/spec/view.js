@@ -62,6 +62,15 @@ describe('view', function() {
             expect( this.view._param.c ).to.eql([9]);
         });
 
+        it('should trigger on param set with correct type and owner', function(done) {
+            this.view.on('param', function(e, data) {
+                expect( e.type ).to.eql('param');
+                expect( e.owner ).to.eql(this.view);
+                done();
+            }.bind(this));
+            this.view.param('a', 2);
+        });
+
     });
 
     describe('_eventinfo', function() {
