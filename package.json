@@ -12,10 +12,18 @@
     "engines": {
         "node": "*"
     },
+    "scripts": {
+        "start": "./node_modules/.bin/nodemon -w lib -w test/spec --exec make test",
+        "test": "./node_modules/.bin/mocha-phantomjs test/index.html"
+    },
     "devDependencies": {
         "mocha": "*",
         "expect.js": "*",
-        "borschik": "*"
+        "borschik": "*",
+        "phantomjs": "*",
+        "mocha-phantomjs": "*",
+        "nodemon": "*",
+        "jshint": "*"
     },
     "private": true
 }

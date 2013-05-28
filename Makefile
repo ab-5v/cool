@@ -1,10 +1,11 @@
 NBIN=$(CURDIR)/node_modules/.bin
 OUTPUT=index.js
 
-all: node_modules bower_modules index.js
-
-index.js: lib/*.js
+$(OUTPUT): lib/*.js test/spec/*.js bower_modules node_modules
 	$(NBIN)/borschik -i lib/cool.js -o $(OUTPUT) --minimize=no
+
+test: $(OUTPUT)
+	npm test
 
 clean:
 	rm $(OUTPUT)
