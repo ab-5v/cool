@@ -49,13 +49,12 @@ function factory(type, proto) {
     // prototype
     cool[type].prototype.extend(
         cool.events,
-        cool.store('data'),
-        cool.store('params'),
         proto
     );
 
     // static
     cool[type].extend(
+        factory,
         { _type: type, _insts: {}, _ctors: {}, _events: {} }
     );
 }
@@ -75,47 +74,49 @@ factory.extend({
     },
 
     define: function(name, desc) {
-        if (!name) { throw new Error('property "name" is mandatory.'); }
-        if (this._ctors[name]) { throw new Error(this._type + ' "' + name + '" is already defined.'); }
+        var ctor;
+        var type = this._type;
+        var ctors = this._ctors;
 
-        var ctor = this._ctors[ name ] = cool[this._type];
-        ctor.prototype = new cool[this._type]();
-        util.extend( ctor.prototype, desc );
+        cool.assert(name, 'Property "name" is mandatory.');
+        cool.assert(!ctors[name], '%1 "%2" is already defined.', type, name);
+
+        ctor = ctors[name] = function() {};
+        ctor.prototype = new cool[type]();
+        ctor.prototype.extend( desc );
 
         return cool;
     },
 
     create: function(name, params) {
-        if (!this._ctors[ name ]) {
-            throw new Error(this._type + ' "' + name + '" is not defined. Use cool.' + this._type + '({name: \'' + name + '\'}) to define it.');
-        }
+        var inst;
+        var type = this._type;
+        var ctor = this._ctors[name];
+        var insts = this._insts;
 
-        var inst = ( new this._ctors[ name ]() )._init(params);
+        // ensure we have a ctor
+        cool.assert(ctor, '%1 "%2" in not defined. Use cool.%1({name: "%2"}).', type, name);
+
+        // creating new instance
+        inst = (new ctor())._init(params);
 
         // ensure instances store
-        if (!this._insts[ name ]) { this._insts[ name ] = []; }
+        if (!insts[name]) { insts[name] = []; }
 
-        this._insts[ name ].push( inst );
+        // add instance to store
+        insts[name].push( inst );
 
-        // self binding
-        util.each(this._events[ name ], function(event) {
-            inst.on(event.type, event.callback, event.context, event.target);
-        });
+        // binding events from the queue
+        //xtnd.each(events[name], function(event, key) {
+        //    inst.on(event.type, event.callback, event.context, event.target);
+        //});
 
         return inst;
-    },
-
-    find: function(name) {
-        return this._insts[name] || [];
-    },
-
-    findOne: function(name) {
-        return this.find(name)[0];
     }
 
 });
 
-cool._factory = factory;
+cool.factory = factory;
 
 })();
 
