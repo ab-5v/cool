@@ -1,6 +1,37 @@
 ;(function(root) {
     var cool = function() {};
 
+    /* cool.assert.js begin */
+;(function(cool) {
+
+var assert = function(cond, msg) {
+    if (cond) { return; }
+
+    var args = xtnd.array(arguments).slice(2);
+
+    throw new Error( cool.assert.msg(msg, args) );
+};
+
+assert.re = /(%(\d))/g;
+
+assert.msg = function(msg, args) {
+    msg = msg || 'unknown error';
+
+    msg = msg.replace(assert.re, function(a, b, index) {
+        return args[index - 1];
+    });
+
+    msg = msg.charAt(0).toUpperCase() + msg.substr(1);
+
+    return msg;
+};
+
+cool.assert = assert;
+
+})(cool);
+
+/* cool.assert.js end */
+
     /* cool.factory.js begin */
 ;(function() {
 
@@ -27,7 +58,7 @@ function factory(type, proto) {
     cool[type].extend(
         { _type: type, _insts: {}, _ctors: {}, _events: {} }
     );
-};
+}
 
 factory.extend({
 
@@ -138,4 +169,4 @@ cool.method = function(name, action) {
 
 
     root.cool = cool;
-})(this)
+})(this);

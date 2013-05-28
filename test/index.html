@@ -8,18 +8,19 @@
     <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
     <link rel="stylesheet" href="./index.css" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
-    <script type="text/javascript" src="../node_modules/pzero/pzero.js"></script>
     <script type="text/javascript" src="../node_modules/expect.js/expect.js"></script>
     <script type="text/javascript" src="../node_modules/mocha/mocha.js"></script>
+
+    <script type="text/javascript" src="../bower_modules/xtnd/index.js"></script>
+    <script type="text/javascript" src="../bower_modules/pzero/index.js"></script>
+
     <script type="text/javascript">mocha.setup('bdd')</script>
 
     <!-- src -->
-    <script src="../cool.js" type="text/javascript"></script>
+    <script src="../index.js" type="text/javascript"></script>
 
     <!-- spec -->
-    <script type="text/javascript" src="spec/util.js"></script>
-    <script type="text/javascript" src="spec/view.js"></script>
-    <script type="text/javascript" src="spec/cool.js"></script>
+    <script type="text/javascript" src="spec/cool.assert.js"></script>
 
     <script type="text/javascript">window.onload = function() { mocha.run(); }</script>
 </head>
