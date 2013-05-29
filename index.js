@@ -1,6 +1,8 @@
 ;(function(root) {
     var cool = function() {};
 
+    cool.promise = pzero;
+
     /* cool.assert.js begin */
 ;(function(cool) {
 
@@ -183,7 +185,7 @@ var method = function(name, action) {
         reply = action();
         event = this._event(name + 'ed');
 
-        if (pzero.is(reply)) {
+        if (cool.promise.is(reply)) {
             reply.then(function(data) {
                 that.emit(event, data);
             });

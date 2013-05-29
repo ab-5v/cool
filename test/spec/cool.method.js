@@ -14,7 +14,7 @@ describe('cool.method', function() {
         });
 
         aim.async = method('async', function() {
-            var promise = pzero();
+            var promise = cool.promise();
             setTimeout(function() {
                 aim.resolved = true;
                 promise.resolve(20);
