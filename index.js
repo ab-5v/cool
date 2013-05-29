@@ -45,7 +45,7 @@ var events = {
      *
      * @type Object
      */
-    _events: null,
+    _events: undefined,
 
     /**
      * Event constructor
@@ -109,7 +109,7 @@ var events = {
         var events = this._events;
 
         if (type) {
-            events = events && events[type];
+            events = events && events[type] && events;
         } else {
             type = xtnd.keys(events);
         }
@@ -117,8 +117,10 @@ var events = {
 
         xtnd.each(type, function(type) {
             events[type] = events[type].filter(function(item) {
-                return !(context && context === item.context
-                    || listener && listener === item.listener);
+                return !(context && !listener && context === item.context
+                    || listener && !context && listener === item.listener
+                    || context && listener && listener === item.listener && context === item.context
+                    || !listener && !context);
             });
         });
 

@@ -81,24 +81,86 @@ describe('cool.events', function() {
 
     describe('off', function() {
 
-        it('should skip if no store found', function() {
-            
+        beforeEach(function() {
+            this.f1 = function() {};
+            this.f2 = function() {};
+
+            this.ctx1 = {};
+            this.ctx2 = {};
+
+            this.emitter._events = {
+                hello: [
+                    {listener: this.f1},
+                    {listener: this.f2, context: this.ctx1}
+                ],
+                aloha: [
+                    {listener: this.f2},
+                    {listener: this.f1, context: this.ctx2}
+                ]
+            };
+
+            this.events = this.emitter._events;
+        });
+
+        it('should skip if no store found for specified type', function() {
+            this.emitter.off('foo');
+
+            expect( this.events.hello.length ).to.eql( 2 );
+            expect( this.events.aloha.length ).to.eql( 2 );
         });
 
         it('should remove all listeners by type', function() {
-            
+            this.emitter.off('hello');
+
+            expect( this.events.hello.length ).to.eql( 0 );
+            expect( this.events.aloha.length ).to.eql( 2 );
         });
 
         it('should remove by listener', function() {
-            
+            this.emitter.off(null, this.f1);
+
+            expect( this.events.hello.length ).to.eql( 1 );
+            expect( this.events.aloha.length ).to.eql( 1 );
         });
 
         it('should remove by context', function() {
-            
+            this.emitter.off(null, null, this.ctx1);
+
+            expect( this.events.hello.length ).to.eql( 1 );
+            expect( this.events.aloha.length ).to.eql( 2 );
+        });
+
+        it('should remove by type and listener', function() {
+            this.emitter.off('hello', this.f1);
+
+            expect( this.events.hello.length ).to.eql( 1 );
+            expect( this.events.aloha.length ).to.eql( 2 );
+        });
+
+        it('should remove by type and context', function() {
+            this.emitter.off('hello', null, this.ctx1);
+
+            expect( this.events.hello.length ).to.eql( 1 );
+            expect( this.events.aloha.length ).to.eql( 2 );
+        });
+
+        it('should remove by listener and context', function() {
+            this.emitter.off(null, this.f2, this.ctx1);
+
+            expect( this.events.hello.length ).to.eql( 1 );
+            expect( this.events.aloha.length ).to.eql( 2 );
+        });
+
+        it('should clear all event with no arguments', function() {
+            this.emitter.off();
+
+            expect( this.events.hello.length ).to.eql( 0 );
+            expect( this.events.aloha.length ).to.eql( 0 );
         });
 
         it('should return `this`', function() {
-            
+            expect( this.emitter.off('foo') ).to.eql( this.emitter );
+            expect( this.emitter.off('hello') ).to.eql( this.emitter );
         });
 
     });
