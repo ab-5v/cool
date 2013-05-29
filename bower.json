@@ -9,6 +9,7 @@
   ],
   "dependencies": {
       "xtnd": "*",
-      "pzero": "*"
+      "pzero": "*",
+      "jquery": "*"
   }
 }
