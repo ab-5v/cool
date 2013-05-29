@@ -170,4 +170,34 @@ describe('cool.method', function() {
         });
 
     });
+
+    describe('extend', function() {
+
+        it('should set of methods', function() {
+            var dest = {};
+
+            method.extend(dest, {
+                'hello': function() {},
+                'bye': function() {}
+            });
+
+            expect( dest.hello ).to.be.a( Function );
+            expect( dest.bye ).to.be.a( Function );
+        });
+
+        it('should be called by method', function() {
+            var dest = {};
+            var props = {t1: function() {}, t2: function() {}};
+            sinon.spy(method, 'extend');
+
+            method(dest, props);
+
+            expect( method.extend.calledOnce ).to.be.ok();
+            expect( method.extend.getCall(0).args )
+                .to.eql( [dest, props] );
+
+            method.extend.restore();
+        });
+
+    });
 });

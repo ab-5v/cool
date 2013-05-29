@@ -170,6 +170,10 @@ function preventDefault() {
 
 var method = function(name, action) {
 
+    if ( xtnd.isObject(name) ) {
+        return method.extend(name, action);
+    }
+
     return function() {
         var reply, event;
         var that = this;
@@ -197,6 +201,16 @@ var method = function(name, action) {
     };
 };
 
+/**
+ * Creates ready for execution action
+ * with multiexecution protections
+ *
+ * @param {Function} action
+ * @param {Object} context
+ * @param {Array} args
+ *
+ * @returns Function
+ */
 method.bindAction = function(action, context, args) {
     var reply, resolved = false;
 
@@ -208,6 +222,23 @@ method.bindAction = function(action, context, args) {
 
         return reply;
     }
+};
+
+/**
+ * Binds set of methods to destination object
+ *
+ * @param {Object} dest
+ * @param {Object} props
+ *
+ * @returns Object
+ */
+method.extend = function(dest, props) {
+
+    xtnd.each(props, function(action, name) {
+        dest[name] = method(name, action);
+    });
+
+    return dest;
 };
 
 cool.method = method;
