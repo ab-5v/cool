@@ -8,13 +8,24 @@ describe('cool.events', function() {
     describe('_event', function() {
 
         it('should create event by `type`', function() {
-            expect( this.emitter._event('hello') )
-                .to.eql( {type: 'hello', owner: this.emitter} );
+            var event = this.emitter._event('hello');
+
+            expect( event ).to.have.property( 'type', 'hello' );
+            expect( event ).to.have.property( 'owner', this.emitter );
+            expect( event ).to.have.property( '_prevented', false );
+            expect( event.preventDefault ).to.be.a( Function );
         });
 
         it('should extend event by `extra`', function() {
             expect( this.emitter._event('hello', {a: 1}) )
                 .to.have.property( 'a', 1 );
+        });
+
+        it('should preventDefault', function() {
+            var event = this.emitter._event('hello');
+            event.preventDefault();
+
+            expect( event ).to.have.property( '_prevented', true );
         });
 
     });

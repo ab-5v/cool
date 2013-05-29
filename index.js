@@ -61,7 +61,10 @@ var events = {
 
         var event = {
             type: type,
-            owner: this
+            owner: this,
+
+           _prevented: false,
+            preventDefault: preventDefault
         };
 
         if (extra) {
@@ -150,6 +153,10 @@ var events = {
 };
 
 cool.events = events;
+
+function preventDefault() {
+    this._prevented = true;
+}
 
 })();
 
