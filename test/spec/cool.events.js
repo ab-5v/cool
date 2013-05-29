@@ -1,7 +1,7 @@
 describe('cool.events', function() {
 
     beforeEach(function() {
-        this.emitter = ({}).extend(cool.events);
+        this.emitter = xtnd({}, cool.events);
         this.listener = sinon.spy();
     });
 

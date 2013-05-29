@@ -5,7 +5,7 @@ describe('cool.method', function() {
 
     beforeEach(function() {
         var aim = this.aim = {};
-        aim.extend(cool.events);
+        xtnd(aim, cool.events);
 
         aim.tested = 0;
         aim.test = method('test', function() {

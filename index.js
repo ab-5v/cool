@@ -69,9 +69,7 @@ var events = {
             preventDefault: preventDefault
         };
 
-        if (extra) {
-            event.extend(extra);
-        }
+        xtnd(event, extra);
 
         return event;
     },
@@ -262,19 +260,16 @@ function factory(type, proto) {
     cool[type].prototype = new cool();
 
     // prototype
-    cool[type].prototype.extend(
-        cool.events,
-        proto
-    );
+    xtnd(cool[type].prototype, cool.events, proto);
 
     // static
-    cool[type].extend(
+    xtnd(cool[type],
         factory,
         { _type: type, _insts: {}, _ctors: {}, _events: {} }
     );
 }
 
-factory.extend({
+xtnd(factory, {
 
     ctor: function(desc, extra) {
 
@@ -298,7 +293,7 @@ factory.extend({
 
         ctor = ctors[name] = function() {};
         ctor.prototype = new cool[type]();
-        ctor.prototype.extend( desc );
+        xtnd( ctor.prototype, desc );
 
         return cool;
     },
