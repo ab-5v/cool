@@ -81,16 +81,16 @@ var events = {
      * @returns this
      */
     on: function(type, listener, context) {
-        var events = this._events || {};
+        var events = this._events = this._events || {};
 
         cool.assert(typeof listener === 'function',
             'listener for %1 should be a function', type);
 
         if (!events[type]) { events[type] = []; }
 
-        eventes[type].push({
-            context: context,
-            listener: listener
+        events[type].push({
+            listener: listener,
+            context: context || this
         });
 
         return this;
