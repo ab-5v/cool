@@ -167,20 +167,72 @@ describe('cool.events', function() {
 
     describe('emit', function() {
 
-        it('shoult call _event if type passed', function() {
-            
+        beforeEach(function() {
+            this.f1 = sinon.spy();
+            this.f2 = sinon.spy();
+            this.f3 = sinon.spy();
+            this.f4 = sinon.spy();
+
+            this.ctx1 = {};
+            this.ctx2 = {};
+
+            this.emitter._events = {
+                hello: [
+                    {listener: this.f1},
+                    {listener: this.f2, context: this.ctx1}
+                ],
+                aloha: [
+                    {listener: this.f3},
+                    {listener: this.f4, context: this.ctx2}
+                ]
+            };
+
+            this.events = this.emitter._events;
         });
 
-        it('should call every istener of specified type', function() {
-            
+        it('shoult call _event if type passed', function() {
+            sinon.spy(this.emitter, '_event');
+
+            this.emitter.emit('hello');
+
+            expect( this.emitter._event.calledOnce ).to.be.ok();
+            expect( this.emitter._event.getCall(0).args[0] )
+                .to.eql( 'hello' );
+        });
+
+        it('should call every listener of specified type', function() {
+            this.emitter.emit('hello');
+
+            expect( this.f1.calledOnce ).to.be.ok();
+            expect( this.f2.calledOnce ).to.be.ok();
+
+            expect( this.f3.called ).not.to.be.ok();
+            expect( this.f4.called ).not.to.be.ok();
         });
 
         it('should pass event object', function() {
-            
+            this.emitter.emit('hello');
+
+            expect( this.f1.getCall(0).args[0] )
+                .to.eql( this.emitter._event('hello') );
         });
 
         it('should pass data object', function() {
-            
+            this.emitter.emit('hello', {a: 1});
+
+            expect( this.f1.getCall(0).args[1] )
+                .to.eql( {a: 1} );
+        });
+
+        it('should set context of listener', function(done) {
+            this.emitter.on('hello', function() {
+
+                expect( this ).to.eql( {a: 2} );
+                done();
+
+            }, {a: 2});
+
+            this.emitter.emit('hello');
         });
 
     });

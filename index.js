@@ -136,7 +136,7 @@ var events = {
     emit: function(event, data) {
         var events = this._events;
 
-        if (typeof event === 'stings') {
+        if (typeof event === 'string') {
             event = this._event(event);
         }
 
