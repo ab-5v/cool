@@ -173,7 +173,7 @@ describe('cool.method', function() {
 
     describe('extend', function() {
 
-        it('should set of methods', function() {
+        it('should add set of methods', function() {
             var dest = {};
 
             method.extend(dest, {
