@@ -15,13 +15,13 @@ describe('cool.model', function() {
         });
 
         it('should set data', function() {
-            this.model.init({a: 1});
+            this.model.init({}, {a: 1});
 
             expect( this.model.data() ).to.eql( {a: 1} );
         });
 
         it('should set params', function() {
-            this.model.init({}, {b: 2});
+            this.model.init({b: 2});
 
             expect( this.model.params() ).to.eql( {b: 2} );
         });
