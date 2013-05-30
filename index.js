@@ -492,7 +492,12 @@ var init = {
         that.models = models;
 
         return cool.promise.when(fetches);
-    },
+    }
+};
+
+cool.view.init = init;
+
+var events = {
 
     re: /^(?:([^. ]+)\.)?([^. ]+)(?:\s(.*))?$/,
 
@@ -521,11 +526,9 @@ var init = {
 
         return info;
     }
-
 };
 
-cool.view.init = init;
-
+cool.view.events = events;
 })();
 
 /* cool.view.js end */
