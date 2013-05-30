@@ -1,6 +1,58 @@
 
 describe('cool.view', function() {
 
+    describe('init', function() {
+
+        var init = cool.view.init;
+
+        beforeEach(function() {
+            this.view = new cool.view();
+
+            sinon.spy(init, 'views');
+            sinon.spy(init, 'models');
+        });
+
+        afterEach(function() {
+            init.views.restore();
+            init.models.restore();
+        });
+
+        it('should set params', function() {
+            this.view.init({a: 1}, {});
+
+            expect( this.view.params() ).to.eql( {a: 1} );
+        });
+
+        it('should set data', function() {
+            this.view.init({}, {b: 2});
+
+            expect( this.view.data() ).to.eql( {b: 2} );
+        });
+
+        it('should call `init.views`', function() {
+            this.view.init({}, {});
+
+            expect( init.views.calledOnce ).to.be.ok();
+            expect( init.views.getCall(0).args[0])
+                .to.eql( this.view );
+        });
+
+        it('should call `init.models`', function() {
+            this.view.init({}, {});
+
+            expect( init.models.calledOnce ).to.be.ok();
+            expect( init.models.getCall(0).args[0])
+                .to.eql( this.view );
+        });
+
+        it('should return this', function() {
+
+            expect( this.view.init({}, {}) ).to.eql( this.view );
+        });
+
+
+    });
+
     describe('toJSON', function() {
 
         beforeEach(function() {
@@ -18,6 +70,7 @@ describe('cool.view', function() {
         });
 
     });
+
     describe('render', function() {
 
         beforeEach(function() {

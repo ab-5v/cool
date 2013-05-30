@@ -429,6 +429,30 @@ cool.factory('view', {
 
 cool.method(cool.view.prototype, {
 
+    /**
+     * Initializes view
+     * Requests all models and renders html
+     *
+     * @private
+     * @param {Object} params for models request
+     * @param {Object} data for template rendering
+     */
+    init: function(params, data) {
+        var that = this;
+
+        that.data(data);
+        that.params(params);
+
+        init.models(that)
+            .then(function() {
+                that.render();
+            });
+
+        init.views(that);
+
+        return this;
+    },
+
     render: function() {
 
         var json = this.toJSON();
@@ -444,33 +468,7 @@ cool.method(cool.view.prototype, {
 
 });
 
-/**
- * Initializes view
- * Requests all models and renders html
- *
- * @private
- * @param {Object} params for models request
- * @param {Object} data for template rendering
- */
-var init = cool.method('init', function(params, data) {
-    var that = this;
-
-    that.data(data);
-    that.params(params);
-
-    init.events(that);
-    init.models(that)
-        .then(function() {
-            that.render();
-            init.events(that, true);
-        });
-
-    init.views(that);
-
-    return this;
-});
-
-xtnd(init, {
+var init = {
 
     views: function(that) {
         var views = {};
@@ -487,8 +485,8 @@ xtnd(init, {
         var models = {};
 
         var fetches = xtnd.map(that.models, function(name) {
-            models[name] = that.model(name);
-            return models[name].fetch(that.params);
+            models[name] = that.model(name, that.params);
+            return models[name].fetch();
         });
 
         that.models = models;
@@ -524,7 +522,7 @@ xtnd(init, {
         return info;
     }
 
-});
+};
 
 cool.view.init = init;
 
