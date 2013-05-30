@@ -19,4 +19,4 @@ node_modules: package.json
 bower_modules: bower.json
 	bower install
 
-.PHONY: clean
+.PHONY: clean test
