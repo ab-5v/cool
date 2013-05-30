@@ -13,9 +13,9 @@ var store = function(name) {
         var prop = '_' + name;
 
         if (arguments.length) {
-            this['_' + name] = val;
+            this[prop] = val;
         } else {
-            return this['_' + name];
+            return this[prop];
         }
     };
 
@@ -145,6 +145,8 @@ var events = {
 
         xtnd.each(type, function(type) {
             events[type] = events[type].filter(function(item) {
+                /* jshint -W014 */
+                /* jshint -W101 */
                 return !(context && !listener && context === item.context
                     || listener && !context && listener === item.listener
                     || context && listener && listener === item.listener && context === item.context
@@ -239,12 +241,12 @@ method.bindAction = function(action, context, args) {
 
     return function() {
         if (!resolved) {
-            reply = action.apply(context, args)
+            reply = action.apply(context, args);
             resolved = true;
         }
 
         return reply;
-    }
+    };
 };
 
 /**
@@ -324,6 +326,7 @@ xtnd(factory, {
     },
 
     create: function(name, params) {
+        /* jshint -W101 */
         var inst;
         var type = this._type;
         var ctor = this._ctors[name];
@@ -368,28 +371,6 @@ cool.factory = factory;
 ;(function() {
 
 cool.factory('view', {
-
-    _init: function(params) {
-        var that = this;
-
-        this.params = params;
-
-        // ensure element
-        this.element();
-
-        // render sub views
-        this.views = xtnd.map(this.views, function(view) {
-            var view = cool.view(name);
-            view.one('rendered', function() {
-                that.append(this);
-            });
-            return cool.view(name);
-        });
-
-
-        return promise();
-        return this;
-    },
 
     /**
      * Returns all the data and params
@@ -483,7 +464,7 @@ xtnd(init, {
             return models[name].fetch(that.params);
         });
 
-        view.models = models;
+        that.models = models;
 
         return cool.promise.when(fetches);
     },
@@ -507,18 +488,14 @@ xtnd(init, {
         var info = {};
         var match = desc.match(this.re);
 
-        cool.assert(match, 'wrong event format %1', desc)
+        cool.assert(match, 'wrong event format %1', desc);
 
         if (match[2]) { info.type = match[2]; }
         if (match[1]) { info.owner = match[1]; }
         if (match[3]) { info.target = match[3]; }
 
         return info;
-    },
-
-    events: function(that) {
-    },
-
+    }
 
 });
 

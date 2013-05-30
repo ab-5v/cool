@@ -1,15 +1,17 @@
 describe('view', function() {
+    /* global before */
 
     describe('param', function() {
-
-        before(function() { cool.view({name: 'param', render: function() {}}); });
+        before(function() {
+            cool.view({name: 'param', render: function() {}});
+        });
 
         beforeEach(function() {
             this.view = cool.view('param');
             this.view._param = {
                 a: 1,
                 b: [1, 2]
-            }
+            };
         });
 
         it('should return param by name', function() {
@@ -62,8 +64,9 @@ describe('view', function() {
             expect( this.view._param.c ).to.eql([9]);
         });
 
-        it('should trigger on param set with correct type and owner', function(done) {
-            this.view.on('param', function(e, data) {
+        it('should trigger on param set with correct type and owner',
+        function(done) {
+            this.view.on('param', function(e) {
                 expect( e.type ).to.eql('param');
                 expect( e.owner ).to.eql(this.view);
                 done();
@@ -76,7 +79,9 @@ describe('view', function() {
     describe('_eventinfo', function() {
 
         before(function() {
-            this.info = function(event) { return cool.view.prototype._eventinfo(event); };
+            this.info = function(event) {
+                return cool.view.prototype._eventinfo(event);
+            };
         });
 
         it('should parse \'click\'', function() {
@@ -84,23 +89,32 @@ describe('view', function() {
         });
 
         it('should parse \'param.someview\'', function() {
-            expect( this.info('param.someview') ).to.eql( {type: 'param', owner: 'someview' } );
+            expect( this.info('param.someview') )
+                .to.eql( {type: 'param', owner: 'someview' } );
         });
 
         it('should parse \'append.someview another\'', function() {
-            expect( this.info('append.someview another') ).to.eql( {type: 'append', owner: 'someview', target: 'another' } );
+            expect( this.info('append.someview another') )
+                .to.eql( {
+                    type: 'append',
+                    owner: 'someview',
+                    target: 'another'
+                } );
         });
 
         it('should parse \'submit form\'', function() {
-            expect( this.info('submit form') ).to.eql( {type: 'submit', target: 'form' } );
+            expect( this.info('submit form') )
+                .to.eql( {type: 'submit', target: 'form' } );
         });
 
         it('should parse \'click .b-image\'', function() {
-            expect( this.info('click .b-image') ).to.eql( {type: 'click', target: '.b-image' } );
+            expect( this.info('click .b-image') )
+                .to.eql( {type: 'click', target: '.b-image' } );
         });
 
         it('should parse \'click .js-image .b-image\'', function() {
-            expect( this.info('click .js-image .b-image') ).to.eql( {type: 'click', target: '.js-image .b-image' } );
+            expect( this.info('click .js-image .b-image') )
+                .to.eql( {type: 'click', target: '.js-image .b-image' } );
         });
     });
 });

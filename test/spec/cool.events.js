@@ -35,7 +35,7 @@ describe('cool.events', function() {
         it('should throw if listener is not a function', function() {
             var emitter = this.emitter;
 
-            expect( function() { emitter.on('hello') } )
+            expect( function() { emitter.on('hello'); } )
                 .to.throwError(/should be a function/);
         });
 

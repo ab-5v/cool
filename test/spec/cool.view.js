@@ -24,9 +24,7 @@ describe('cool.view', function() {
             this.view = new cool.view();
             this.view.params('a');
             this.view.html = function(json) {
-                console.log('call html');
-                return '<i>' + json.params + '</i>'
-                    + '<b>' + 123 + '</b>';
+                return '<i>' + json.params + '</i><b>123</b>';
             };
             sinon.spy(this.view, 'html');
             sinon.spy(this.view, 'toJSON');

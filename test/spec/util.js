@@ -32,7 +32,8 @@ describe('util', function() {
         });
 
         it('should extend object with few objects', function() {
-            expect( util.extend({a: 1}, {b: 2}, {c: 3}) ).to.eql( {a: 1, b: 2, c: 3} );
+            expect( util.extend({a: 1}, {b: 2}, {c: 3}) )
+                .to.eql( {a: 1, b: 2, c: 3} );
         });
 
         it('should properties of object', function() {

@@ -5,6 +5,7 @@ $(OUTPUT): lib/*.js test/spec/*.js bower_modules node_modules
 	$(NBIN)/borschik -i lib/cool.js -o $(OUTPUT) --minimize=no
 
 test: $(OUTPUT)
+	$(NBIN)/jshint lib/*.js test/spec/*.js
 	npm test
 
 clean:

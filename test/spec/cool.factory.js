@@ -98,13 +98,13 @@ describe('cool.factory', function() {
         });
 
         it('should throw if no name passed', function() {
-            expect( function() { cool.test1.define() } )
+            expect( function() { cool.test1.define(); } )
                 .to.throwError();
         });
 
         it('should throw if already defined', function() {
 
-            expect( function() { cool.test1.define('hello') } )
+            expect( function() { cool.test1.define('hello'); } )
                .to.throwError();
         });
 
@@ -115,12 +115,12 @@ describe('cool.factory', function() {
 
         it('new objects should be instances of `type`', function() {
 
-            expect( new this.hello ).to.be.a( cool.test1 );
+            expect( new this.hello() ).to.be.a( cool.test1 );
         });
 
         it('new objects should be instances of cool', function() {
 
-            expect( new this.hello ).to.be.a( cool );
+            expect( new this.hello() ).to.be.a( cool );
         });
 
         it('should extend set prototype of `type`', function() {

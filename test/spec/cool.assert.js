@@ -19,7 +19,8 @@ describe('cool.assert', function() {
     });
 
     it('should throw on falsy value', function() {
-        expect( function() { assert(0, 'Err #%1-%2', 3, 5); } ).to.throwError(/Err #3-5/);
+        expect( function() { assert(0, 'Err #%1-%2', 3, 5); } )
+            .to.throwError(/Err #3-5/);
     });
 
 });
