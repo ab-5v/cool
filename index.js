@@ -3,6 +3,31 @@
 
     cool.promise = pzero;
 
+    /* cool.store.js begin */
+;(function() {
+
+var store = function(name) {
+    var mixin = {};
+
+    mixin[name] = function(val) {
+        var prop = '_' + name;
+
+        if (arguments.length) {
+            this['_' + name] = val;
+        } else {
+            return this['_' + name];
+        }
+    };
+
+    return mixin;
+};
+
+cool.store = store;
+
+})();
+
+/* cool.store.js end */
+
     /* cool.assert.js begin */
 ;(function(cool) {
 
@@ -337,13 +362,6 @@ cool.factory = factory;
 ;(function() {
 cool.factory('view', {
 
-    /**
-     * Initializes view
-     * Requests all models and renders html
-     *
-     * @private
-     * @param {Object} params for template rendering
-     */
     _init: function(params) {
         var that = this;
 
@@ -355,7 +373,9 @@ cool.factory('view', {
         // render sub views
         this.views = xtnd.map(this.views, function(view) {
             var view = cool.view(name);
-            view.one('inited', that.append);
+            view.one('rendered', function() {
+                that.append(this);
+            });
             return cool.view(name);
         });
 
@@ -398,17 +418,49 @@ cool.factory('view', {
     }
 });
 
-var init = cool.method('init', function(params) {
+cool.method(cool.view.prototype, {
+
+    render: function() {
+
+        var params = this.params();
+        var data = xtnd.map(this.models, function(model) {
+            return model.data();
+        });
+
+        var html = this.html( {data: data, params: params} );
+        var el = $( html ).eq(0);
+
+        if (this.el) {
+            this.el.html( el.html() );
+        } else {
+            this.el = el;
+        }
+    }
+
+});
+
+/**
+ * Initializes view
+ * Requests all models and renders html
+ *
+ * @private
+ * @param {Object} params for models request
+ * @param {Object} data for template rendering
+ */
+var init = cool.method('init', function(params, data) {
     var that = this;
 
+    that.data(data);
+    that.params(params);
+
     init.events(that);
-    init.models(this)
+    init.models(that)
         .then(function() {
             that.render();
             init.events(that, true);
         });
 
-    init.views(this);
+    init.views(that);
 
     return this;
 });
