@@ -472,8 +472,8 @@ var init = {
 
     views: function(that) {
         var views = {};
-        var data = that.data;
-        var params = that.params;
+        var data = that.data();
+        var params = that.params();
 
         xtnd.each(that.views, function(name) {
 

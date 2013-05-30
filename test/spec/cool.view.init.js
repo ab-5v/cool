@@ -56,6 +56,20 @@ describe('cool.view.init', function() {
             expect( this.view.views['v2'].name ).to.be( 'v2' );
         });
 
+        it('should pass params to each view', function() {
+            init.views(this.view);
+
+            expect( this.view.views['v1'].params() ).to.eql( {b: 2} );
+            expect( this.view.views['v2'].params() ).to.eql( {b: 2} );
+        });
+
+        it('should pass data to each view', function() {
+            init.views(this.view);
+
+            expect( this.view.views['v1'].data() ).to.eql( {a: 1} );
+            expect( this.view.views['v2'].data() ).to.eql( {a: 1} );
+        });
+
         it('should bind on `rendered` when element not ready', function() {
             this.view.views = ['async'];
             init.views(this.view);
