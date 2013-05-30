@@ -400,7 +400,7 @@ cool.factory('view', {
     }
 });
 
-xtnd(cool.view.prototype, {
+cool.method(cool.view.prototype, {
 
     render: function() {
 
