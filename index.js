@@ -358,6 +358,12 @@ cool.factory = factory;
 /* cool.factory.js end */
 
 
+    xtnd(cool.prototype,
+        cool.events,
+        cool.store('data'),
+        cool.store('params')
+    );
+
     /* cool.view.js begin */
 ;(function() {
 cool.factory('view', {
