@@ -15,6 +15,9 @@ describe('cool.view', function() {
         afterEach(function() {
             init.views.restore();
             init.models.restore();
+
+            cool.view._insts = {};
+            cool.view._ctors = {};
         });
 
         it('should set params', function() {
@@ -43,6 +46,13 @@ describe('cool.view', function() {
             expect( init.models.calledOnce ).to.be.ok();
             expect( init.models.getCall(0).args[0])
                 .to.eql( this.view );
+        });
+
+        it('should call `render` immediately w/o models', function() {
+            sinon.spy(this.view, 'render');
+            this.view.init({}, {});
+
+            expect( this.view.render.calledOnce ).to.be.ok();
         });
 
         it('should return this', function() {

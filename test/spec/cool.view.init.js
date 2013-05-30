@@ -7,6 +7,18 @@ describe('cool.view.init', function() {
         beforeEach(function() {
             cool.view({name: 'v1'});
             cool.view({name: 'v2'});
+            cool.view({name: 'async', models: ['async']});
+
+            cool.model({
+                name: 'async',
+                url: '/test',
+                fetch: function() {
+                    var t = this;
+                    var p = pzero();
+                    setTimeout(function() { p.resolve(t); }, 10);
+                    return p;
+                }
+            });
 
             this.view = new cool.view();
             this.view.data({a: 1});
@@ -14,7 +26,6 @@ describe('cool.view.init', function() {
             this.view.views = ['v1', 'v2'];
 
             sinon.spy(cool, 'view');
-            sinon.spy(this.view, 'append');
         });
 
         afterEach(function() {
@@ -22,6 +33,8 @@ describe('cool.view.init', function() {
 
             cool.view._insts = {};
             cool.view._ctors = {};
+            cool.model._insts = {};
+            cool.model._ctors = {};
 
         });
 
@@ -43,17 +56,37 @@ describe('cool.view.init', function() {
             expect( this.view.views['v2'].name ).to.be( 'v2' );
         });
 
-        it('should bind on `rendered` event', function() {
+        it('should bind on `rendered` when element not ready', function() {
+            this.view.views = ['async'];
             init.views(this.view);
 
-            expect( this.view.views['v1']._events['rendered'].length )
+            expect( this.view.views['async']._events['rendered'].length )
                 .to.eql(1);
         });
 
         it('should call `append` when subview `rendered`', function() {
+            sinon.spy(this.view, 'append');
             init.views(this.view);
 
-            //expect( this.view.append.calledOnce ).to.be.ok();
+            expect( this.view.append.calledTwice ).to.be.ok();
+            expect( this.view.append.getCall(0).args[0] )
+                .to.eql( this.view.views['v1'] );
+            expect( this.view.append.getCall(1).args[0] )
+                .to.eql( this.view.views['v2'] );
+        });
+
+        it('should call `append` for async subview', function(done) {
+            var view = this.view;
+            view.views = ['async'];
+            sinon.spy(view, 'append');
+            init.views(view);
+
+            setTimeout(function() {
+                expect( view.append.calledOnce ).to.be.ok();
+                expect( view.append.getCall(0).args[0] )
+                    .to.eql( view.views['async'] );
+                done();
+            }, 10);
         });
 
     });
