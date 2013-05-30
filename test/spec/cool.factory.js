@@ -7,7 +7,7 @@ describe('cool.factory', function() {
         delete cool.test2;
     });
 
-    it('should produce given type of object', function() {
+    it('should produce specified type of object', function() {
         factory('test1', {});
 
         expect( cool.test1 ).to.be.a( Function );
@@ -24,6 +24,15 @@ describe('cool.factory', function() {
         factory('test1', {});
 
         expect( cool.test1._type ).to.eql( 'test1' );
+    });
+
+    it('should pass arguments to ctor', function() {
+        factory('test1', {a: 1});
+        sinon.stub(cool.test1, 'ctor');
+
+        cool.test1(1, 2, 3);
+
+        expect( cool.test1.ctor.getCall(0).args ).to.eql( [1, 2, 3] );
     });
 
     ['ctor', 'define', 'create']

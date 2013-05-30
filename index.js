@@ -301,10 +301,10 @@ cool.method = method;
 
 function factory(type, proto) {
 
-    cool[type] = function (desc, extra) {
+    cool[type] = function (desc, params, data) {
         if (this instanceof cool[type]) { return; }
 
-        return cool[type].ctor(desc, extra);
+        return cool[type].ctor(desc, params, data);
     };
 
     // instanceof chain
