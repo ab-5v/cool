@@ -26,6 +26,11 @@ describe('cool.model', function() {
             expect( this.model.params() ).to.eql( {b: 2} );
         });
 
+        it('should return `this`', function() {
+
+            expect( this.model.init({}, {}) ).to.eql( this.model );
+        });
+
     });
 
     describe('fetch', function() {

@@ -560,6 +560,8 @@ cool.method(cool.model.prototype, {
 
         this.data(data);
         this.params(params);
+
+        return this;
     },
 
     fetch: function() {
