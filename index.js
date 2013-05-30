@@ -366,6 +366,7 @@ cool.factory = factory;
 
     /* cool.view.js begin */
 ;(function() {
+
 cool.factory('view', {
 
     _init: function(params) {
@@ -391,32 +392,26 @@ cool.factory('view', {
     },
 
     /**
-     * Renders HTML string
+     * Returns all the data and params
      *
-     * @param {Object} params
-     *
-     * @return String
+     * @returns Object
      */
-    render: function(params) {
-        return '<h1>' + params.name + '</h1>';
+    toJSON: function() {
+        return {
+            data: this.data(),
+            params: this.params()
+        };
     },
 
     /**
-     * Enshures root view element
+     * Renders HTML string
+     *
+     * @param {Object} json
+     *
+     * @return String
      */
-    element: function() {
-
-        var el = $( this.render(this.params) ).eq(0);
-
-        if ( !this.el ) {
-            // rendering element html
-            this.el = el;
-        } else {
-            // replacing content of existing element
-            this.el.html( el.html() );
-        }
-
-        return this;
+    html: function(json) {
+        return '<h1>' + json.params.name + '</h1>';
     },
 
     append: function(child) {
@@ -424,16 +419,12 @@ cool.factory('view', {
     }
 });
 
-cool.method(cool.view.prototype, {
+xtnd(cool.view.prototype, {
 
     render: function() {
 
-        var params = this.params();
-        var data = xtnd.map(this.models, function(model) {
-            return model.data();
-        });
-
-        var html = this.html( {data: data, params: params} );
+        var json = this.toJSON();
+        var html = this.html( json );
         var el = $( html ).eq(0);
 
         if (this.el) {
