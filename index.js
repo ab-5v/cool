@@ -472,13 +472,17 @@ var init = {
 
     views: function(that) {
         var views = {};
+        var data = that.data;
+        var params = that.params;
 
         xtnd.each(that.views, function(name) {
-            views[name] = cool.view(name, that.params);
+            views[name] = cool.view(name, params, data);
             views[name].one('rendered', function() {
                 that.append(this);
             });
         });
+
+        that.views = views;
     },
 
     models: function(that) {
