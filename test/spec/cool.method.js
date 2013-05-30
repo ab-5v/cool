@@ -123,6 +123,12 @@ describe('cool.method', function() {
         this.aim.async();
     });
 
+    it('should pass every actions call', function() {
+        this.aim.test(); this.aim.test(); this.aim.test();
+
+        expect( this.aim.tested ).to.eql( 3 );
+    });
+
     describe('bindAction', function() {
 
         it('should return function', function() {

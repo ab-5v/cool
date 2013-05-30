@@ -198,18 +198,18 @@ var method = function(name, action) {
     }
 
     return function() {
-        var reply, event;
+        var reply, event, binded;
         var that = this;
         var args = xtnd.array(arguments);
 
-        action = method.bindAction(action, this, args);
-        event = this._event(name, {action: action});
+        binded = method.bindAction(action, this, args);
+        event = this._event(name, {action: binded});
 
         this.emit(event);
 
         if (event._prevented) { return; }
 
-        reply = action();
+        reply = binded();
         event = this._event(name + 'ed');
 
         if (cool.promise.is(reply)) {
