@@ -79,11 +79,32 @@ describe('cool.factory', function() {
                 .to.eql( {a: 1} );
         });
 
-        it('should ensure object for "create"', function() {
+        it('should ensure params for "create"', function() {
             factory.ctor('hello');
 
             expect( factory.create.getCall(0).args[1] )
                 .to.eql( {} );
+        });
+
+        it('should ensure data for "create"', function() {
+            factory.ctor('hello');
+
+            expect( factory.create.getCall(0).args[2] )
+                .to.eql( {} );
+        });
+
+        it('should pass params', function() {
+            factory.ctor('hello', {a: 1});
+
+            expect( factory.create.getCall(0).args[1] )
+                .to.eql( {a: 1} );
+        });
+
+        it('should pass data', function() {
+            factory.ctor('hello', null, {b: 2});
+
+            expect( factory.create.getCall(0).args[2] )
+                .to.eql( {b: 2} );
         });
 
     });
@@ -153,9 +174,9 @@ describe('cool.factory', function() {
 
         beforeEach(function() {
             factory('test1', {
-                _init: function() { return this; }
+                init: function() { return this; }
             });
-            sinon.spy(cool.test1.prototype, '_init');
+            sinon.spy(cool.test1.prototype, 'init');
             cool.test1.define('hello');
         });
 
@@ -178,11 +199,11 @@ describe('cool.factory', function() {
             expect( cool.test1._insts['hello'][1] ).to.be.a( cool );
         });
 
-        it('should call _init with params', function() {
+        it('should call "init" with params', function() {
             cool.test1.create('hello', {a: 1});
 
-            expect( cool.test1.prototype._init.calledOnce ).to.be.ok();
-            expect( cool.test1.prototype._init.getCall(0).args[0] )
+            expect( cool.test1.prototype.init.calledOnce ).to.be.ok();
+            expect( cool.test1.prototype.init.getCall(0).args[0] )
                 .to.eql( {a: 1} );
         });
 

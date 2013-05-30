@@ -298,7 +298,7 @@ function factory(type, proto) {
 
 xtnd(factory, {
 
-    ctor: function(desc, extra) {
+    ctor: function(desc, params, data) {
 
         // view defenition
         if (typeof desc === 'object') {
@@ -306,7 +306,10 @@ xtnd(factory, {
 
         // view instatntiation
         } else if (typeof desc === 'string') {
-            return this.create(desc, extra || {});
+            data = data || {};
+            params = params || {};
+
+            return this.create(desc, params, data);
         }
     },
 
@@ -325,7 +328,7 @@ xtnd(factory, {
         return cool;
     },
 
-    create: function(name, params) {
+    create: function(name, params, data) {
         /* jshint -W101 */
         var inst;
         var type = this._type;
@@ -336,7 +339,7 @@ xtnd(factory, {
         cool.assert(ctor, '%1 "%2" in not defined. Use cool.%1({name: "%2"}).', type, name);
 
         // creating new instance
-        inst = (new ctor())._init(params);
+        inst = (new ctor()).init(params, data);
 
         // ensure instances store
         if (!insts[name]) { insts[name] = []; }
