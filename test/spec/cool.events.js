@@ -176,6 +176,52 @@ describe('cool.events', function() {
 
     });
 
+    describe('one', function() {
+
+        it('should throw if listener is not a function', function() {
+            var emitter = this.emitter;
+
+            expect( function() { emitter.one('hello'); } )
+                .to.throwError(/should be a function/);
+        });
+
+        it('should emit only once by listener', function() {
+            this.emitter.one('hello', this.listener);
+
+            this.emitter.emit('hello');
+            this.emitter.emit('hello');
+
+            expect( this.listener.calledOnce ).to.be.ok();
+        });
+
+        it('should emit only once by listener and context', function() {
+            this.emitter.one('hello', this.listener, {a: 1});
+
+            this.emitter.emit('hello');
+            this.emitter.emit('hello');
+
+            expect( this.listener.calledOnce ).to.be.ok();
+        });
+
+        it('should emit with specified context', function(done) {
+            var emitter = this.emitter;
+            emitter.one('hello', function() {
+
+                expect( this ).to.eql( {a: 1} );
+                done();
+            }, {a: 1});
+
+            emitter.emit('hello');
+        });
+
+        it('should return `this`', function() {
+
+            expect( this.emitter.on('hello', this.listener) )
+                .to.eql( this.emitter );
+        });
+
+    });
+
     describe('emit', function() {
 
         beforeEach(function() {

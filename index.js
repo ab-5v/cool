@@ -158,6 +158,30 @@ var events = {
     },
 
     /**
+     * Adds listener for specified event
+     * and removes it after first execution
+     *
+     * @param {String} type
+     * @param {Function} listener
+     * @param {Object} context
+     */
+    one: function(type, listener, context) {
+        var that = this;
+
+        cool.assert(typeof listener === 'function',
+            'listener for %1 should be a function', type);
+
+        var proxy = function() {
+            listener.apply(this, arguments);
+            that.off(type, proxy, context);
+        };
+
+        this.on(type, proxy, context);
+
+        return this;
+    },
+
+    /**
      * Executes each of the listeners
      *
      * @param {Object|String} event
