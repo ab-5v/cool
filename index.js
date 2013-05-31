@@ -467,7 +467,75 @@ cool.method(cool.view.prototype, {
         }
     },
 
-    append: function() {
+    /**
+     * Appends subview
+     *
+     * @param {cool.view} view
+     */
+    append: function(view) {
+        var name = view.name;
+        var views = this._views;
+
+        if (!views[name]) {
+            views[name] = [];
+        }
+
+        if (view._parent) {
+            view.detach(true);
+        }
+
+        this.el.append(view.el);
+        view._parent = this;
+        views[name].push(view);
+    },
+
+    /**
+     * Removes view
+     * from it's parent subviews list.
+     * Removes subview from DOM if `!skipDom`
+     *
+     * @param {Boolean} skipDom
+     */
+    detach: function(skipDom) {
+        var views = this._parent._views[this.name];
+        var index = views.indexOf(this);
+
+        if (index > -1) {
+            views.splice(index, 1);
+        } else {
+            // TODO: remove this in production
+            cool.assert(0, 'view %1 not found in subviews', this.name);
+        }
+
+        if (!skipDom) {
+            this.el.detach();
+        }
+    },
+
+    /**
+     * Removes view from wherever,
+     * unbind it's events and destroys it.
+     */
+    remove: function() {
+        this.detach();
+
+        this.empty();
+
+        events.off(this);
+
+        this.el.remove();
+    },
+
+    /**
+     * Removes all subviews
+     */
+    empty: function() {
+
+        xtnd.each(this._views, function(set) {
+            xtnd.each(set, function(view) {
+                view.remove();
+            });
+        });
     }
 
 });
@@ -541,6 +609,9 @@ var events = {
         if (match[3]) { info.target = match[3]; }
 
         return info;
+    },
+
+    off: function() {
     }
 };
 
