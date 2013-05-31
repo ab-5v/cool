@@ -82,6 +82,18 @@ describe('cool.method', function() {
         expect( this.aim.tested ).to.eql( 0 );
     });
 
+    it('should prevent `action` by any preventDefault', function() {
+        this.aim.on('test', function() {});
+        this.aim.on('test', function(evt) {
+            evt.preventDefault();
+        });
+        this.aim.on('test', function() {});
+
+        this.aim.test();
+
+        expect( this.aim.tested ).to.eql( 0 );
+    });
+
     it('should perfom action while emit', function() {
         this.aim.on('test', function(evt) {
             evt.preventDefault();
