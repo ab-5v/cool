@@ -254,4 +254,42 @@ describe('cool.view', function() {
 
     });
 
+    describe('remove', function() {
+        beforeEach(function() {
+            this.view = cool.view('v1');
+            this.v201 = cool.view('v2');
+
+            this.view.append(this.v201);
+        });
+
+        it('should call `detach` if view has _parent', function() {
+            sinon.spy(this.v201, 'detach');
+            this.v201.remove();
+
+            expect( this.v201.detach.calledOnce ).to.be.ok();
+        });
+
+        it('should not call `detach` for view w/o _parent', function() {
+            sinon.spy(this.view, 'detach');
+            this.view.remove();
+
+            expect( this.view.detach.called ).not.to.be.ok();
+        });
+
+        it('should call `empty`', function() {
+            sinon.spy(this.view, 'empty');
+            this.view.remove();
+
+            expect( this.view.empty.calledOnce ).to.be.ok();
+        });
+
+        it('should remove element', function() {
+            sinon.spy(this.view.el, 'remove');
+            this.view.remove();
+
+            expect( this.view.el.remove.calledOnce ).to.be.ok();
+        });
+
+    });
+
 });

@@ -524,11 +524,12 @@ cool.method(cool.view.prototype, {
      * unbind it's events and destroys it.
      */
     remove: function() {
-        this.detach();
+
+        if (this._parent) {
+            this.detach();
+        }
 
         this.empty();
-
-        events.off(this);
 
         this.el.remove();
     },
