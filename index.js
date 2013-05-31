@@ -625,10 +625,12 @@ var events = {
      * @param {cool.view} view
      */
     view: function(view) {
+        view.events = view.events || {};
 
-        var parsed = events.parse();
+        var parsed = events.parse(view);
         //view.one('rendered', function() {
         //    events.dom(view, parsed);
+        //    events.model(view, parsed);
         //});
 
         events.on(view, parsed);
@@ -641,7 +643,21 @@ var events = {
      * @param {cool.view} view
      */
     parse: function(view) {
-        return view;
+        var parsed = [];
+
+        xtnd.each(view.events, function(listener, desc) {
+            desc = events.info(desc);
+            listener = view[listener];
+
+            parsed.push({
+                type: desc.type,
+                owner: desc.owner,
+                target: desc.target,
+                listener: listener
+            });
+        });
+
+        return parsed;
     },
 
     /**
