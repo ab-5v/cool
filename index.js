@@ -507,7 +507,7 @@ cool.method(cool.view.prototype, {
         if (index > -1) {
             views.splice(index, 1);
         } else {
-            // TODO: remove this in production
+            // indicates inifite recursion
             cool.assert(0,
                 'view %1 not found in subviews', this.name);
         }
@@ -540,9 +540,7 @@ cool.method(cool.view.prototype, {
     empty: function() {
 
         xtnd.each(this._views, function(set) {
-            xtnd.each(set, function(view) {
-                view.remove();
-            });
+            while (set.length) { set[0].remove(); }
         });
     }
 

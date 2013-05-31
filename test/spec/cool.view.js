@@ -4,6 +4,7 @@ describe('cool.view', function() {
     beforeEach(function() {
         cool.view({name: 'v1'});
         cool.view({name: 'v2'});
+        cool.view({name: 'v3'});
     });
 
     afterEach(function() {
@@ -288,6 +289,40 @@ describe('cool.view', function() {
             this.view.remove();
 
             expect( this.view.el.remove.calledOnce ).to.be.ok();
+        });
+
+    });
+
+    describe('empty', function() {
+
+        beforeEach(function() {
+            this.view = cool.view('v1');
+            this.v201 = cool.view('v2');
+            this.v202 = cool.view('v2');
+            this.v301 = cool.view('v3');
+
+            this.view.append(this.v201);
+            this.view.append(this.v202);
+            this.view.append(this.v301);
+
+            sinon.spy(this.v201, 'remove');
+            sinon.spy(this.v202, 'remove');
+            sinon.spy(this.v301, 'remove');
+        });
+
+        it('should call `remove` for each subview', function() {
+            this.view.empty();
+
+            expect( this.v201.remove.calledOnce ).to.be.ok();
+            expect( this.v202.remove.calledOnce ).to.be.ok();
+            expect( this.v301.remove.calledOnce ).to.be.ok();
+        });
+
+        it('should empty all stores', function() {
+            this.view.empty();
+
+            expect( this.view._views['v2'] ).to.eql( [] );
+            expect( this.view._views['v3'] ).to.eql( [] );
         });
 
     });
