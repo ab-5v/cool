@@ -200,5 +200,58 @@ describe('cool.view', function() {
 
     });
 
+    describe('detach', function() {
+
+        beforeEach(function() {
+            this.view = cool.view('v1');
+            this.v201 = cool.view('v2');
+            this.v202 = cool.view('v2');
+
+            this.view.append(this.v201);
+            this.view.append(this.v202);
+        });
+
+        it('should remove view from subviews store', function() {
+            this.v202.detach();
+
+            expect( this.view._views['v2'] ).to.eql( [this.v201] );
+        });
+
+        it('should throw on view w/o parent', function() {
+            var view = this.view;
+
+            expect( function() { view.detach(); } )
+                .to.throwError(/_parent/);
+        });
+
+        it('should leave empty array after detaching last', function() {
+            this.v201.detach();
+            this.v202.detach();
+
+            expect( this.view._views['v2'] ).to.eql( [] );
+        });
+
+        it('should remove `_parent` link', function() {
+            this.v201.detach();
+
+            expect( this.v201 ).not.to.have.property( '_parent' );
+            expect( this.v202 ).to.have.property( '_parent' );
+        });
+
+        it('should detach dom by default', function() {
+            this.v201.detach();
+
+            expect( this.view.el.find( this.v201.el ).length ).to.eql( 0 );
+            expect( this.view.el.find( this.v202.el ).length ).to.eql( 1 );
+        });
+
+        it('should not detach dom with `skipDom`', function() {
+            this.v201.detach(true);
+
+            expect( this.view.el.find( this.v201.el ).length ).to.eql( 1 );
+            expect( this.view.el.find( this.v202.el ).length ).to.eql( 1 );
+        });
+
+    });
 
 });

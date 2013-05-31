@@ -497,6 +497,10 @@ cool.method(cool.view.prototype, {
      * @param {Boolean} skipDom
      */
     detach: function(skipDom) {
+
+        cool.assert(this._parent,
+            'detach for %1 called w/o _parent', this.name);
+
         var views = this._parent._views[this.name];
         var index = views.indexOf(this);
 
@@ -504,8 +508,11 @@ cool.method(cool.view.prototype, {
             views.splice(index, 1);
         } else {
             // TODO: remove this in production
-            cool.assert(0, 'view %1 not found in subviews', this.name);
+            cool.assert(0,
+                'view %1 not found in subviews', this.name);
         }
+
+        delete this._parent;
 
         if (!skipDom) {
             this.el.detach();
