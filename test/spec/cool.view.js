@@ -1,6 +1,16 @@
 
 describe('cool.view', function() {
 
+    beforeEach(function() {
+        cool.view({name: 'v1'});
+        cool.view({name: 'v2'});
+    });
+
+    afterEach(function() {
+        cool.view._insts = {};
+        cool.view._ctors = {};
+    });
+
     describe('init', function() {
 
         var init = cool.view.init;
@@ -137,5 +147,58 @@ describe('cool.view', function() {
         });
 
     });
+
+    describe('append', function() {
+
+        beforeEach(function() {
+            this.view = cool.view('v1');
+            this.v201 = cool.view('v2');
+            this.v202 = cool.view('v2');
+        });
+
+        it('should ensure specified store', function() {
+            this.view.append(this.v201);
+
+            expect( this.view._views['v2'] ).to.be.an( Array );
+        });
+
+        it('should add subviews to store', function() {
+            this.view.append(this.v201);
+            this.view.append(this.v202);
+
+            expect( this.view._views['v2'] )
+                .to.eql( [this.v201, this.v202] );
+        });
+
+        it('should call `detach` if subview has parent', function() {
+            this.v201.append(this.v202);
+            sinon.spy(this.v202, 'detach');
+            this.view.append(this.v202);
+
+            expect( this.v202.detach.calledOnce ).to.be.ok();
+            expect( this.v202.detach.getCall(0).args[0] ).to.eql( true );
+        });
+
+        it('should not call `detach` if subview has no parent', function() {
+            sinon.spy(this.v202, 'detach');
+            this.view.append(this.v202);
+
+            expect( this.v202.detach.called ).not.to.be.ok();
+        });
+
+        it('should set `_parent` of subview', function() {
+            this.view.append(this.v202);
+
+            expect( this.v202._parent ).to.eql( this.view );
+        });
+
+        it('should append dom element', function() {
+            this.view.append(this.v202);
+
+            expect( this.view.el.find( this.v202.el ).length ).to.eql( 1 );
+        });
+
+    });
+
 
 });
