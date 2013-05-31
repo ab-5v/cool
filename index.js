@@ -471,9 +471,9 @@ cool.method(cool.view.prototype, {
 var init = {
 
     views: function(that) {
-        var views = {};
         var data = that.data();
         var params = that.params();
+        var views = that._views = {};
 
         xtnd.each(that.views, function(name) {
 
@@ -489,8 +489,6 @@ var init = {
                 });
             }
         });
-
-        that.views = views;
     },
 
     models: function(that) {
