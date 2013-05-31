@@ -174,7 +174,7 @@ describe('cool.view.init', function() {
 
 
         it('should call `fetch` for each model', function() {
-            sinon.spy(cool.model.prototype, 'fetch');
+            sinon.stub(cool.model.prototype, 'fetch');
             cool.model({name: 't', url: '/'});
             this.view.models = ['t'];
             init.models(this.view);
