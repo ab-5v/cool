@@ -193,7 +193,6 @@ describe('cool.view.init', function() {
 
             init.models(view)
                 .then(function() {
-                    console.log(arguments);
 
                     expect( view.models['a1'].data() ).to.eql( {t: 10} );
                     expect( view.models['a2'].data() ).to.eql( {t: 20} );
