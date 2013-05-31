@@ -437,6 +437,8 @@ cool.method(cool.view.prototype, {
     init: function(params, data) {
         var that = this;
 
+        events.view(that);
+
         that.data(data);
         that.params(params);
 
@@ -617,8 +619,58 @@ var events = {
         return info;
     },
 
-    off: function() {
+    /**
+     * Initialize events for the view
+     *
+     * @param {cool.view} view
+     */
+    view: function(view) {
+
+        var parsed = events.parse();
+        //view.one('rendered', function() {
+        //    events.dom(view, parsed);
+        //});
+
+        events.on(view, parsed);
+
+    },
+
+    /**
+     * Parses user's defined events
+     *
+     * @param {cool.view} view
+     */
+    parse: function(view) {
+        return view;
+    },
+
+    /**
+     * Binds custom events
+     *
+     * @param {cool.view} view
+     */
+    on: function(view) {
+        return view;
+    },
+
+    /**
+     * Unbinds custom events
+     *
+     * @param {cool.view} view
+     */
+    off: function(view) {
+        return view;
+    },
+
+    /**
+     * Binds dom events
+     *
+     * @param {cool.view} view
+     */
+    dom: function(view) {
+        return view;
     }
+
 };
 
 cool.view.events = events;
