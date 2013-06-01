@@ -117,6 +117,185 @@ describe('cool.factory.events', function() {
 
     });
 
+    describe('on', function() {
+
+        beforeEach(function() {
+            this.view = new cool.view();
+            this.model = new cool.model();
+
+            this.ev = {
+                kind: 'view', type: 'append',
+                master: 'ev', slave: 'subview',
+                listener: sinon.spy()
+            };
+            this.ed = {
+                kind: 'dom', type: 'click',
+                listener: sinon.spy()
+            };
+            this.em = {
+                kind: 'model', type: 'read',
+                master: 'em',
+                listener: sinon.spy()
+            };
+            this.et = {
+                kind: 'view', type: 'init', slave: 'sub1', master: 'this',
+                listener: sinon.spy()
+            };
+
+            sinon.spy(events, 'store');
+            sinon.spy(this.view, 'on');
+        });
+
+        afterEach(function() {
+            cool.view._events = {};
+            cool.model._events = {};
+
+            events.store.restore();
+        });
+
+        it('should ignore `dom` events', function() {
+            events.on(this.view, [this.ev, this.ed, this.em]);
+
+            expect( events.store.calledTwice ).to.be.ok();
+            expect( events.store.getCall(0).args[1] ).to.eql(this.ev);
+            expect( events.store.getCall(1).args[1] ).to.eql(this.em);
+        });
+
+
+        it('should isolate `this` events from store', function() {
+            events.on(this.view, [this.et]);
+
+            expect( events.store.called ).not.to.be.ok();
+        });
+
+        it('should bind `this` events immediately', function() {
+            events.on(this.view, [this.et]);
+
+            expect( this.view.on.calledOnce ).to.be.ok();
+            expect( this.view.on.getCall(0).args )
+                .to.be.eql([
+                    'init',
+                    this.et.listener,
+                    this.view,
+                    'sub1'
+                ]);
+        });
+
+        it('should add event to queue', function() {
+            events.on(this.view, [this.ev]);
+
+            expect( events.store.calledOnce ).to.be.ok();
+            expect( events.store.getCall(0).args )
+                .to.eql( [this.view, this.ev] );
+        });
+
+        it('should process existing views', function() {
+            var spy = sinon.spy();
+            cool.view._insts = [{name: 'ev', on: spy}];
+            events.on(this.view, [this.ev]);
+
+            expect( spy.calledOnce ).to.be.ok();
+            expect( spy.getCall(0).args )
+                .to.eql( [
+                    'append',
+                    this.ev.listener,
+                    this.view,
+                    'subview'
+                ]);
+        });
+
+        it('should process existing models', function() {
+            var spy = sinon.spy();
+            cool.model._insts = [{name: 'em', on: spy}];
+            events.on(this.view, [this.em]);
+
+            expect( spy.calledOnce ).to.be.ok();
+            expect( spy.getCall(0).args )
+                .to.eql( [
+                    'read',
+                    this.em.listener,
+                    this.view,
+                    undefined
+                ]);
+        });
+
+        it('should filter instances', function() {
+            var spy = sinon.spy();
+            cool.view._insts = [{name: 'ef', on: spy}];
+            events.on(this.view, [this.ev]);
+
+            expect( spy.called ).not.to.be.ok();
+        });
+
+        describe('store', function() {
+
+            it('should ensure queue', function() {
+                events.store({}, this.ev);
+
+                expect( cool.view._events['ev'] )
+                    .to.be.an( Array );
+            });
+
+            it('should store event', function() {
+                events.store(this.view, this.ev);
+
+                expect( cool.view._events['ev'][0] )
+                    .to.eql({
+                        type: this.ev.type,
+                        slave: this.ev.slave,
+                        context: this.view,
+                        listener: this.ev.listener
+                    });
+            });
+
+        });
+
+        describe('restore', function() {
+
+            it('should process view', function() {
+                var view = {name: 'ev', on: sinon.spy()};
+                this.ev.context = {a: 1};
+                cool.view._events['ev'] = [ this.ev ];
+                events.restore(view, 'view');
+
+                expect( view.on.calledOnce ).to.be.ok();
+                expect( view.on.getCall(0).args )
+                    .to.eql( [
+                        'append',
+                        this.ev.listener,
+                        {a: 1},
+                        'subview'
+                    ]);
+            });
+
+            it('should process model', function() {
+                var model = {name: 'em', on: sinon.spy(), context: {}};
+                this.em.context = {b: 2};
+                cool.model._events['em'] = [ this.em ];
+                events.restore(model, 'model');
+
+                expect( model.on.calledOnce ).to.be.ok();
+                expect( model.on.getCall(0).args )
+                    .to.eql( [
+                        'read',
+                        this.em.listener,
+                        {b: 2},
+                        undefined
+                    ]);
+            });
+
+            it('should filter instances', function() {
+                var view = {name: 'ev', on: sinon.spy(), context: {}};
+                events.restore(view, 'view');
+
+                expect( view.on.called ).not.to.be.ok();
+            });
+
+        });
+
+    });
+
+
     describe('parse', function() {
 
         beforeEach(function() {

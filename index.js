@@ -491,40 +491,50 @@ var events = {
      * @param {Array} parsed
      */
     on: function(view, parsed) {
+        var that = this;
 
         xtnd.each(parsed, function(info) {
             if (!(/view|model/).test(info.kind)) { return; }
 
             var store = cool[info.kind]._insts;
-            var queue = cool[info.kind]._events;
 
-            if (!queue[ info.type ]) {
-                queue[ info.type ] = [];
-            }
-
-            // TODO: anybody subscribed to init will miss it
-            // while event binding is inside init
             if (info.master === 'this') {
+                // bind event only for current view
                 view.on(info.type, info.listener, view, info.slave);
             } else {
 
-                // bind to existing views
+                // bind current event to existing views and models
                 xtnd.each(store, function(inst) {
-                    inst.on(info.type, info.listener, info.context, info.slave);
+                    if (inst.name === info.master) {
+                        inst.on(info.type, info.listener, view, info.slave);
+                    }
                 });
 
-                // add to queue for upcoming views
-                queue.push({
-                    type: info.type,
-                    slave: info.slave,
-                    context: view,
-                    listener: info.listener
-                });
-
+                that.store(view, info);
             }
-
         });
-        return view;
+    },
+
+    /**
+     * Stores event in queue of events
+     *
+     * @param {cool.view} view
+     * @param {Object} info
+     */
+    store: function(view, info) {
+        var queue = cool[info.kind]._events;
+
+        if (!queue[ info.master ]) {
+            queue[ info.master ] = [];
+        }
+
+        // add to queue for upcoming views and models
+        queue[ info.master ].push({
+            type: info.type,
+            slave: info.slave,
+            context: view,
+            listener: info.listener
+        });
     },
 
     /**
