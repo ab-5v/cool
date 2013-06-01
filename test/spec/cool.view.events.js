@@ -20,11 +20,15 @@ describe('cool.view.events', function() {
         beforeEach(function() {
             this.view = new cool.view();
 
+            sinon.spy(events, 'on');
             sinon.spy(events, 'dom');
+            sinon.stub(events, 'parse', function() { return {a: 1}; });
         });
 
         afterEach(function() {
+            events.on.restore();
             events.dom.restore();
+            events.parse.restore();
         });
 
         it('should ensure `view.events`', function() {
@@ -57,7 +61,6 @@ describe('cool.view.events', function() {
         });
 
         it('should pass parsed events to `events.dom`', function() {
-            sinon.stub(events, 'parse', function() { return {a: 1}; });
             this.view.events = {'click': 'init'};
             events.view( this.view );
             this.view.emit('rendered');
@@ -65,9 +68,22 @@ describe('cool.view.events', function() {
             expect( events.dom.getCall(0).args[1] )
                 .to.eql( events.parse(this.view) );
 
-            events.parse.restore();
         });
 
+        it('should call `events.on`', function() {
+            events.view( this.view );
+
+            expect( events.on.calledOnce ).to.be.ok();
+            expect( events.on.getCall(0).args[0] ).to.eql( this.view );
+        });
+
+        it('should pass parsed events to `events.on`', function() {
+            this.view.events = {'click': 'init'};
+            events.view( this.view );
+
+            expect( events.on.getCall(0).args[1] )
+                .to.eql( events.parse(this.view) );
+        });
     });
 
 
