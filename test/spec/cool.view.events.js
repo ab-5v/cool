@@ -63,7 +63,9 @@ describe('cool.view.events', function() {
 
         beforeEach(function() {
             this.view = new cool.view();
-            this.view.events = {'click': 'init', 'submit': 'render'};
+            this.view.test = sinon.spy();
+            this.listener = sinon.spy();
+            this.view.events = {'click': 'test', 'submit': this.listener};
             this.parsed = events.parse( this.view );
         });
 
@@ -91,9 +93,36 @@ describe('cool.view.events', function() {
             expect( events.parse(this.view) ).to.eql( [] );
         });
 
-        it('should return view\'s method as listener', function() {
+        it('should throw if listener is not a function', function() {
+            var view = this.view;
+            this.view.events = {'click': 'foo'};
 
-            expect( this.parsed[0].listener ).to.eql( this.view.init );
+            expect( function() { events.parse(view); } )
+                .to.throwError(/listener/i);
+        });
+
+        it('should return view\'s method as listener', function() {
+            this.parsed[0].listener();
+
+            expect( this.view.test.calledOnce ).to.be.ok();
+        });
+
+        it('should return a function as listener', function() {
+            this.parsed[1].listener();
+
+            expect( this.listener.calledOnce ).to.be.ok();
+        });
+
+        it('should call view\' method in context of view', function() {
+            this.parsed[0].listener();
+
+            expect( this.view.test.calledOn( this.view) ).to.be.ok();
+        });
+
+        it('should bind listener in context of view', function() {
+            this.parsed[1].listener();
+
+            expect( this.listener.calledOn( this.view) ).to.be.ok();
         });
 
     });

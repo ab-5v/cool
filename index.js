@@ -647,7 +647,13 @@ var events = {
 
         xtnd.each(view.events, function(listener, desc) {
             desc = events.info(desc);
-            listener = view[listener];
+            listener = typeof listener === 'function' ?
+                listener : view[listener];
+
+            cool.assert(typeof listener === 'function',
+                'listener for %1 should be a function', desc.type);
+
+            listener = listener.bind(view);
 
             parsed.push({
                 type: desc.type,
