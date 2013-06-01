@@ -597,10 +597,12 @@ var events = {
      * Parses event descriptions, which could be:
      * @example
      *
-     *  click .selector
-     *  append view
-     *  view.append view
-     *  model.read
+     *           submit
+     *  form  -> submit
+     *           append
+     *  view  -> append
+     *  view  -> append subview
+     *  model -> fetch
      *
      * @param {String} desc
      *
