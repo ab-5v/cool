@@ -15,7 +15,7 @@ describe('cool.view.events', function() {
         });
     });
 
-    describe('view', function() {
+    describe('init', function() {
 
         beforeEach(function() {
             this.view = new cool.view();
@@ -32,20 +32,20 @@ describe('cool.view.events', function() {
         });
 
         it('should ensure `view.events`', function() {
-            events.view( this.view );
+            events.init( this.view );
 
             expect( this.view.events ).to.eql( {} );
         });
 
         it('should keep original events', function() {
             this.view.events = {'click': 'init'};
-            events.view( this.view );
+            events.init( this.view );
 
             expect( this.view.events ).to.eql( {'click': 'init'} );
         });
 
         it('should call `events.dom` when view is `rendered`', function() {
-            events.view( this.view );
+            events.init( this.view );
             this.view.emit( this.view._event('rendered') );
 
             expect( events.dom.calledOnce ).to.be.ok();
@@ -53,7 +53,7 @@ describe('cool.view.events', function() {
         });
 
         it('should call `events.dom` only on first `rendered`', function() {
-            events.view( this.view );
+            events.init( this.view );
             this.view.emit( this.view._event('rendered') );
             this.view.emit( this.view._event('rendered') );
 
@@ -62,7 +62,7 @@ describe('cool.view.events', function() {
 
         it('should pass parsed events to `events.dom`', function() {
             this.view.events = {'click': 'init'};
-            events.view( this.view );
+            events.init( this.view );
             this.view.emit('rendered');
 
             expect( events.dom.getCall(0).args[1] )
@@ -71,7 +71,7 @@ describe('cool.view.events', function() {
         });
 
         it('should call `events.on`', function() {
-            events.view( this.view );
+            events.init( this.view );
 
             expect( events.on.calledOnce ).to.be.ok();
             expect( events.on.getCall(0).args[0] ).to.eql( this.view );
@@ -79,7 +79,7 @@ describe('cool.view.events', function() {
 
         it('should pass parsed events to `events.on`', function() {
             this.view.events = {'click': 'init'};
-            events.view( this.view );
+            events.init( this.view );
 
             expect( events.on.getCall(0).args[1] )
                 .to.eql( events.parse(this.view) );
