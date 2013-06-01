@@ -19,6 +19,12 @@ describe('cool.view.events', function() {
 
         beforeEach(function() {
             this.view = new cool.view();
+
+            sinon.spy(events, 'dom');
+        });
+
+        afterEach(function() {
+            events.dom.restore();
         });
 
         it('should ensure `view.events`', function() {
@@ -32,6 +38,34 @@ describe('cool.view.events', function() {
             events.view( this.view );
 
             expect( this.view.events ).to.eql( {'click': 'init'} );
+        });
+
+        it('should call `events.dom` when view is `rendered`', function() {
+            events.view( this.view );
+            this.view.emit( this.view._event('rendered') );
+
+            expect( events.dom.calledOnce ).to.be.ok();
+            expect( events.dom.getCall(0).args[0] ).to.eql( this.view );
+        });
+
+        it('should call `events.dom` only on first `rendered`', function() {
+            events.view( this.view );
+            this.view.emit( this.view._event('rendered') );
+            this.view.emit( this.view._event('rendered') );
+
+            expect( events.dom.calledOnce ).to.be.ok();
+        });
+
+        it('should pass parsed events to `events.dom`', function() {
+            sinon.stub(events, 'parse', function() { return {a: 1}; });
+            this.view.events = {'click': 'init'};
+            events.view( this.view );
+            this.view.emit('rendered');
+
+            expect( events.dom.getCall(0).args[1] )
+                .to.eql( events.parse(this.view) );
+
+            events.parse.restore();
         });
 
     });
@@ -101,6 +135,18 @@ describe('cool.view.events', function() {
             this.parsed[1].listener();
 
             expect( this.listener.calledOn( this.view) ).to.be.ok();
+        });
+
+        it('should be unique for each view', function() {
+            var v1 = new cool.view();
+            v1.events = {'click': 'init'};
+            var v2 = new cool.view();
+            v2.events = {'click': 'init'};
+
+            expect( events.parse(v1)[0] )
+                .to.not.equal( events.parse(v2)[0] );
+            expect( events.parse(v1)[0].listener )
+                .to.not.equal( events.parse(v2)[0].listener );
         });
 
     });

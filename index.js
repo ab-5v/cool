@@ -641,6 +641,7 @@ var events = {
         view.events = view.events || {};
 
         var parsed = events.parse(view);
+
         view.one('rendered', function() {
             events.dom(view, parsed);
         //    events.model(view, parsed);
@@ -664,7 +665,7 @@ var events = {
                 listener : view[listener];
 
             cool.assert(typeof listener === 'function',
-                'listener for %1 should be a function', desc.type);
+                'listener for "%1" should be a function', desc.type);
 
             listener = listener.bind(view);
 
