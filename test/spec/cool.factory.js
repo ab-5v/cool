@@ -182,7 +182,7 @@ describe('cool.factory', function() {
     describe('create', function() {
 
         beforeEach(function() {
-            factory.events.test1 = function() {};
+            factory.events.test1 = sinon.spy();
             factory('test1', {
                 init: function() { return this; }
             });
@@ -202,6 +202,23 @@ describe('cool.factory', function() {
             expect( cool.test1._insts['hello'][0] ).to.be.a( cool );
         });
 
+        it('should call events init for instance', function() {
+            var inst = cool.test1.create('hello');
+
+            expect( factory.events.test1.calledOnce ).to.be.ok();
+            expect( factory.events.test1.getCall(0).args )
+                .to.eql( [inst] );
+        });
+
+        it('should call `events.init` before `inst.init`', function() {
+            cool.test1.create('hello');
+            var instInit = cool.test1.prototype.init;
+            var eventInit = factory.events.test1;
+
+            expect( eventInit.calledBefore(instInit) )
+                .to.be.ok();
+        });
+
         it('should store one more instance instance', function() {
             cool.test1._insts['hello'] = [123];
             cool.test1.create('hello');
@@ -209,12 +226,20 @@ describe('cool.factory', function() {
             expect( cool.test1._insts['hello'][1] ).to.be.a( cool );
         });
 
-        it('should call "init" with params', function() {
+        it('should call `init` with params', function() {
             cool.test1.create('hello', {a: 1});
 
             expect( cool.test1.prototype.init.calledOnce ).to.be.ok();
             expect( cool.test1.prototype.init.getCall(0).args[0] )
                 .to.eql( {a: 1} );
+        });
+
+        it('should call `init` with data', function() {
+            cool.test1.create('hello', {a: 1}, {b: 2});
+
+            expect( cool.test1.prototype.init.calledOnce ).to.be.ok();
+            expect( cool.test1.prototype.init.getCall(0).args[1] )
+                .to.eql( {b: 2} );
         });
 
         it('should return instance', function() {
