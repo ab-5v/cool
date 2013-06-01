@@ -697,19 +697,22 @@ var events = {
         return view;
     },
 
-    test: {
-        dom: function(desc) { return !desc.owner; }
-    },
-
     /**
      * Binds dom events
      *
      * @param {cool.view} view
+     * @param {Array} parsed
      */
     dom: function(view, parsed) {
-        parsed = parsed.filter( events.test.dom );
+
         xtnd.each(parsed, function(info) {
-            view.el.on(info.type, info.target, info.listener);
+            if (info.kind !== 'dom') { return; }
+
+            if (info.master === 'this') {
+                view.el.on(info.type, info.listener);
+            } else {
+                view.el.on(info.type, info.master, info.listener);
+            }
         });
     },
 

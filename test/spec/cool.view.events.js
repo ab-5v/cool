@@ -105,4 +105,52 @@ describe('cool.view.events', function() {
 
     });
 
+
+    describe('dom', function() {
+
+        beforeEach(function() {
+            this.view = { el: { on: sinon.spy() } };
+            this.info = {
+                kind: 'dom',
+                type: 'click',
+                master: 'this',
+                listener: function() {}
+            };
+        });
+
+        it('should call `on` on events kind a dom', function() {
+            events.dom(this.view, [ this.info ]);
+
+            expect( this.view.el.on.calledOnce ).to.be.ok();
+        });
+
+        it('should call `on` on each event kind a dom', function() {
+            events.dom(this.view, [ {kind: 'dom'}, {kind: 'dom'} ]);
+
+            expect( this.view.el.on.calledTwice ).to.be.ok();
+        });
+
+        it('should skip all events w/o kind dom', function() {
+            events.dom(this.view, [ {}, {kind: 'view'}, {kind: 'model'} ]);
+
+            expect( this.view.el.on.called ).not.to.be.ok();
+        });
+
+        it('should call w/o selector on `master=this`', function() {
+            events.dom(this.view, [ this.info ]);
+
+            expect( this.view.el.on.getCall(0).args )
+                .to.eql( ['click', this.info.listener] );
+        });
+
+        it('should call w selector on `master!=this`', function() {
+            this.info.master = '.selector';
+            events.dom(this.view, [ this.info ]);
+
+            expect( this.view.el.on.getCall(0).args )
+                .to.eql( ['click', '.selector', this.info.listener] );
+        });
+
+    });
+
 });
