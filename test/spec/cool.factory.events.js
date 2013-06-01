@@ -324,6 +324,13 @@ describe('cool.factory.events', function() {
             expect( this.parsed.length ).to.eql( 2 );
         });
 
+        it('should keep items formated', function() {
+            var res = this.parsed[0];
+            delete res.listener;
+
+            expect( res ).to.eql( events.info('click') );
+        });
+
         it('should return empty array on no events', function() {
             this.view.events = {};
 
