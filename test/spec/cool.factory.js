@@ -182,6 +182,7 @@ describe('cool.factory', function() {
     describe('create', function() {
 
         beforeEach(function() {
+            factory.events.test1 = function() {};
             factory('test1', {
                 init: function() { return this; }
             });
