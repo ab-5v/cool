@@ -62,25 +62,32 @@ describe('cool.view.init', function() {
             expect( cool.view.returnValues[1].name ).to.be( 'v2' );
         });
 
+        it('should ensure views store to be Array', function() {
+            init.views(this.view);
+
+            expect( this.view._views['v1'] ).to.be.an( Array );
+            expect( this.view._views['v2'] ).to.be.an( Array );
+        });
+
         it('should store created views', function() {
             init.views(this.view);
 
-            expect( this.view._views['v1'].name ).to.be( 'v1' );
-            expect( this.view._views['v2'].name ).to.be( 'v2' );
+            expect( this.view._views['v1'][0].name ).to.be( 'v1' );
+            expect( this.view._views['v2'][0].name ).to.be( 'v2' );
         });
 
         it('should pass params to each view', function() {
             init.views(this.view);
 
-            expect( this.view._views['v1'].params() ).to.eql( {b: 2} );
-            expect( this.view._views['v2'].params() ).to.eql( {b: 2} );
+            expect( this.view._views['v1'][0].params() ).to.eql( {b: 2} );
+            expect( this.view._views['v2'][0].params() ).to.eql( {b: 2} );
         });
 
         it('should pass data to each view', function() {
             init.views(this.view);
 
-            expect( this.view._views['v1'].data() ).to.eql( {a: 1} );
-            expect( this.view._views['v2'].data() ).to.eql( {a: 1} );
+            expect( this.view._views['v1'][0].data() ).to.eql( {a: 1} );
+            expect( this.view._views['v2'][0].data() ).to.eql( {a: 1} );
         });
 
         it('should call `append` when subview `rendered`', function() {
@@ -88,9 +95,9 @@ describe('cool.view.init', function() {
 
             expect( this.view.append.calledTwice ).to.be.ok();
             expect( this.view.append.getCall(0).args[0] )
-                .to.eql( this.view._views['v1'] );
+                .to.eql( this.view._views['v1'][0] );
             expect( this.view.append.getCall(1).args[0] )
-                .to.eql( this.view._views['v2'] );
+                .to.eql( this.view._views['v2'][0] );
         });
 
         it('should call once `append` for async subview', function(done) {
@@ -101,7 +108,7 @@ describe('cool.view.init', function() {
             setTimeout(function() {
                 expect( view.append.calledOnce ).to.be.ok();
                 expect( view.append.getCall(0).args[0] )
-                    .to.eql( view._views['async'] );
+                    .to.eql( view._views['async'][0] );
                 done();
             }, 10);
         });

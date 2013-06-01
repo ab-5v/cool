@@ -788,7 +788,9 @@ var init = {
 
             var view = cool.view(name, params, data);
 
-            views[name] = view;
+            if (!views[name]) {views[name] = [];}
+
+            views[name].push(view);
 
             if (view.el) {
                 that.append(view);
