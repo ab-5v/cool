@@ -83,14 +83,6 @@ describe('cool.view.init', function() {
             expect( this.view._views['v2'].data() ).to.eql( {a: 1} );
         });
 
-        it('should bind on `rendered` when element not ready', function() {
-            this.view.views = ['async'];
-            init.views(this.view);
-
-            expect( this.view._views['async']._events['rendered'].length )
-                .to.eql(1);
-        });
-
         it('should call `append` when subview `rendered`', function() {
             init.views(this.view);
 
@@ -101,7 +93,7 @@ describe('cool.view.init', function() {
                 .to.eql( this.view._views['v2'] );
         });
 
-        it('should call `append` for async subview', function(done) {
+        it('should call once `append` for async subview', function(done) {
             var view = this.view;
             view.views = ['async'];
             init.views(view);
