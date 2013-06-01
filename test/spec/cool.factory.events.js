@@ -362,18 +362,6 @@ describe('cool.factory.events', function() {
             expect( this.listener.calledOn( this.view) ).to.be.ok();
         });
 
-        it('should be unique for each view', function() {
-            var v1 = new cool.view();
-            v1.events = {'click': 'init'};
-            var v2 = new cool.view();
-            v2.events = {'click': 'init'};
-
-            expect( events.parse(v1)[0] )
-                .to.not.equal( events.parse(v2)[0] );
-            expect( events.parse(v1)[0].listener )
-                .to.not.equal( events.parse(v2)[0].listener );
-        });
-
     });
 
 
