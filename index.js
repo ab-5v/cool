@@ -448,7 +448,7 @@ var events = {
     /**
      * Binds events from queue for model
      *
-     * @param {cool.model} view
+     * @param {cool.model} model
      */
     model: function(model) {
         events.restore(model, 'model');

@@ -23,12 +23,14 @@ describe('cool.factory.events', function() {
             sinon.spy(events, 'on');
             sinon.spy(events, 'dom');
             sinon.stub(events, 'parse', function() { return {a: 1}; });
+            sinon.spy(events, 'restore');
         });
 
         afterEach(function() {
             events.on.restore();
             events.dom.restore();
             events.parse.restore();
+            events.restore.restore();
         });
 
         it('should ensure `view.events`', function() {
@@ -54,8 +56,8 @@ describe('cool.factory.events', function() {
 
         it('should call `events.dom` only on first `rendered`', function() {
             events.view( this.view );
-            this.view.emit( this.view._event('rendered') );
-            this.view.emit( this.view._event('rendered') );
+            this.view.emit('rendered');
+            this.view.emit('rendered');
 
             expect( events.dom.calledOnce ).to.be.ok();
         });
@@ -84,8 +86,36 @@ describe('cool.factory.events', function() {
             expect( events.on.getCall(0).args[1] )
                 .to.eql( events.parse(this.view) );
         });
+
+        it('should call `events.restore`', function() {
+            events.view( this.view, 'view' );
+
+            expect( events.restore.calledOnce ).to.be.ok();
+            expect( events.restore.getCall(0).args )
+                .to.eql( [this.view, 'view'] );
+        });
     });
 
+    describe('model', function() {
+
+        beforeEach(function() {
+            this.model = new cool.model();
+            sinon.spy(events, 'restore');
+        });
+
+        afterEach(function() {
+            events.restore.restore();
+        });
+
+        it('should call `events.restore`', function() {
+            events.model( this.model );
+
+            expect( events.restore.calledOnce ).to.be.ok();
+            expect( events.restore.getCall(0).args )
+                .to.eql( [this.model, 'model'] );
+        });
+
+    });
 
     describe('parse', function() {
 
