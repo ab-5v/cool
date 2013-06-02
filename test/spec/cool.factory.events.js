@@ -176,7 +176,6 @@ describe('cool.factory.events', function() {
                 .to.be.eql([
                     'init',
                     this.et.listener,
-                    this.view,
                     'sub1'
                 ]);
         });
@@ -199,7 +198,6 @@ describe('cool.factory.events', function() {
                 .to.eql( [
                     'append',
                     this.ev.listener,
-                    this.view,
                     'subview'
                 ]);
         });
@@ -214,7 +212,6 @@ describe('cool.factory.events', function() {
                 .to.eql( [
                     'read',
                     this.em.listener,
-                    this.view,
                     undefined
                 ]);
         });
@@ -243,7 +240,6 @@ describe('cool.factory.events', function() {
                     .to.eql({
                         type: this.ev.type,
                         slave: this.ev.slave,
-                        context: this.view,
                         listener: this.ev.listener
                     });
             });
@@ -254,7 +250,6 @@ describe('cool.factory.events', function() {
 
             it('should process view', function() {
                 var view = {name: 'ev', on: sinon.spy()};
-                this.ev.context = {a: 1};
                 cool.view._events['ev'] = [ this.ev ];
                 events.restore(view, 'view');
 
@@ -263,14 +258,12 @@ describe('cool.factory.events', function() {
                     .to.eql( [
                         'append',
                         this.ev.listener,
-                        {a: 1},
                         'subview'
                     ]);
             });
 
             it('should process model', function() {
                 var model = {name: 'em', on: sinon.spy(), context: {}};
-                this.em.context = {b: 2};
                 cool.model._events['em'] = [ this.em ];
                 events.restore(model, 'model');
 
@@ -279,7 +272,6 @@ describe('cool.factory.events', function() {
                     .to.eql( [
                         'read',
                         this.em.listener,
-                        {b: 2},
                         undefined
                     ]);
             });
