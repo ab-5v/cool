@@ -62,6 +62,28 @@ describe('cool.method', function() {
         this.aim.test();
     });
 
+    it('should emit with `undefined` in slave by default', function(done) {
+        this.aim.on('test', function(evt) {
+
+            expect( evt.slave ).to.eql( undefined );
+            done();
+        });
+
+        this.aim.test();
+    });
+
+    it('should emit with slave if `cool` instance passed', function(done) {
+        var inst = new cool.view(); inst.name = 'foo';
+
+        this.aim.on('test', function(evt) {
+
+            expect( evt.slave ).to.eql( 'foo' );
+            done();
+        });
+
+        this.aim.test(inst);
+    });
+
     it('should emit after `action`', function(done) {
         this.aim.on('tested', function() {
 

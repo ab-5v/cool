@@ -245,9 +245,10 @@ var method = function(name, action) {
         var reply, event, binded;
         var that = this;
         var args = xtnd.array(arguments);
+        var slave = args[0] instanceof cool ? args[0].name : undefined;
 
         binded = method.bindAction(action, this, args);
-        event = this._event(name, {action: binded});
+        event = this._event(name, {action: binded, slave: slave});
 
         this.emit(event);
 
