@@ -635,7 +635,7 @@ cool.factory.events = events;
     xtnd(cool.prototype,
         cool.events,
         cool.store('data'),
-        cool.store('params')
+        cool.store('param')
     );
 
     /* cool.view.js begin */
@@ -651,7 +651,7 @@ cool.factory('view', {
     toJSON: function() {
         return {
             data: this.data(),
-            params: this.params()
+            params: this.param()
         };
     },
 
@@ -682,7 +682,7 @@ cool.method(cool.view.prototype, {
         var that = this;
 
         that.data(data);
-        that.params(params);
+        that.param(params);
 
         init.models(that)
             .then(function() {
@@ -794,7 +794,7 @@ var init = {
 
     views: function(that) {
         var data = that.data();
-        var params = that.params();
+        var params = that.param();
         var views = that._views = {};
 
         xtnd.each(that.views, function(name) {
@@ -818,7 +818,7 @@ var init = {
     models: function(that) {
         var models = {};
         var data = that.data();
-        var params = that.params();
+        var params = that.param();
 
         var fetches = xtnd.map(that.models, function(name) {
             models[name] = cool.model(name, params, data);
@@ -849,7 +849,7 @@ cool.method(cool.model.prototype, {
         cool.assert(this.url, 'you should specify url for model %1', this.name);
 
         this.data(data);
-        this.params(params);
+        this.param(params);
 
         return this;
     },
@@ -857,7 +857,7 @@ cool.method(cool.model.prototype, {
     fetch: function() {
         var url = this.url;
         var type = 'get';
-        var params = this.params();
+        var params = this.param();
         var promise = cool.promise();
 
         $.ajax({

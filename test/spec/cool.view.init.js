@@ -15,7 +15,7 @@ describe('cool.view.init', function() {
 
         this.view = new cool.view();
         this.view.data({a: 1});
-        this.view.params({b: 2});
+        this.view.param({b: 2});
     });
 
     afterEach(function() {
@@ -79,8 +79,8 @@ describe('cool.view.init', function() {
         it('should pass params to each view', function() {
             init.views(this.view);
 
-            expect( this.view._views['v1'][0].params() ).to.eql( {b: 2} );
-            expect( this.view._views['v2'][0].params() ).to.eql( {b: 2} );
+            expect( this.view._views['v1'][0].param() ).to.eql( {b: 2} );
+            expect( this.view._views['v2'][0].param() ).to.eql( {b: 2} );
         });
 
         it('should pass data to each view', function() {
@@ -160,8 +160,8 @@ describe('cool.view.init', function() {
         it('should pass params to each model', function() {
             init.models(this.view);
 
-            expect( this.view.models['a1'].params() ).to.eql( {b: 2} );
-            expect( this.view.models['a2'].params() ).to.eql( {b: 2} );
+            expect( this.view.models['a1'].param() ).to.eql( {b: 2} );
+            expect( this.view.models['a2'].param() ).to.eql( {b: 2} );
         });
 
         it('should pass data to each model', function() {

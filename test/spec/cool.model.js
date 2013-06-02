@@ -23,7 +23,7 @@ describe('cool.model', function() {
         it('should set params', function() {
             this.model.init({b: 2});
 
-            expect( this.model.params() ).to.eql( {b: 2} );
+            expect( this.model.param() ).to.eql( {b: 2} );
         });
 
         it('should return `this`', function() {

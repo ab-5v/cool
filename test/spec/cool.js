@@ -16,9 +16,9 @@ describe('cool', function() {
         expect( this.inst.data ).to.be.a( Function );
     });
 
-    it('should provide "params" store', function() {
+    it('should provide "param" store', function() {
 
-        expect( this.inst.params ).to.be.a( Function );
+        expect( this.inst.param ).to.be.a( Function );
     });
 
 });

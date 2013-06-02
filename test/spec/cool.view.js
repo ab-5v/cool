@@ -34,7 +34,7 @@ describe('cool.view', function() {
         it('should set params', function() {
             this.view.init({a: 1}, {});
 
-            expect( this.view.params() ).to.eql( {a: 1} );
+            expect( this.view.param() ).to.eql( {a: 1} );
         });
 
         it('should set data', function() {
@@ -82,7 +82,7 @@ describe('cool.view', function() {
 
         it('should return all json of the view', function() {
             this.view.data({a: 1});
-            this.view.params({b: 2});
+            this.view.param({b: 2});
 
             expect( this.view.toJSON() ).to.eql( {
                 data: {a: 1},
@@ -96,7 +96,7 @@ describe('cool.view', function() {
 
         beforeEach(function() {
             this.view = new cool.view();
-            this.view.params('a');
+            this.view.param('a');
             this.view.html = function(json) {
                 return '<i>' + json.params + '</i><b>123</b>';
             };
@@ -140,7 +140,7 @@ describe('cool.view', function() {
 
             var el = this.view.el[0];
 
-            this.view.params('b');
+            this.view.param('b');
             this.view.render();
 
             expect( this.view.el[0] ).to.eql( el );
