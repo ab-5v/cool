@@ -88,7 +88,8 @@ var events = {
 
         var event = {
             type: type,
-            owner: this,
+            slave: undefined,
+            emitter: this,
 
            _prevented: false,
             preventDefault: preventDefault
@@ -104,11 +105,11 @@ var events = {
      *
      * @param {String} type
      * @param {Function} listener
-     * @param {Object} context
+     * @param {String} slave
      *
      * @returns this
      */
-    on: function(type, listener, context) {
+    on: function(type, listener, slave) {
         var events = this._events = this._events || {};
 
         cool.assert(typeof listener === 'function',
@@ -118,22 +119,22 @@ var events = {
 
         events[type].push({
             listener: listener,
-            context: context || this
+            slave: slave || '*'
         });
 
         return this;
     },
 
     /**
-     * Removes listener by event/listener/context
+     * Removes listener by event/listener/slave
      *
      * @param {String} type
      * @param {Function} listener
-     * @param {Object} context
+     * @param {String} slave
      *
      * @returns this
      */
-    off: function(type, listener, context) {
+    off: function(type, listener, slave) {
         var events = this._events;
 
         if (type) {
@@ -145,12 +146,26 @@ var events = {
 
         xtnd.each(type, function(type) {
             events[type] = events[type].filter(function(item) {
-                /* jshint -W014 */
-                /* jshint -W101 */
-                return !(context && !listener && context === item.context
-                    || listener && !context && listener === item.listener
-                    || context && listener && listener === item.listener && context === item.context
-                    || !listener && !context);
+                var exclude = true;
+                var slaveMatch = slave === item.slave;
+                var listenerMatch = listener === item.listener;
+
+                // exclude all
+                if (!slave && !listener) {
+                    exclude = true;
+                // exclude by slave
+                // but can't exclude '*' by specific slave
+                } else if (slave && !listener) {
+                    exclude = slaveMatch;
+                // exclude by listener
+                } else if (!slave && listener) {
+                    exclude = listenerMatch;
+                // exclude by both slave and listener
+                } else {
+                    exclude = slaveMatch && listenerMatch;
+                }
+
+                return !exclude;
             });
         });
 
@@ -163,9 +178,9 @@ var events = {
      *
      * @param {String} type
      * @param {Function} listener
-     * @param {Object} context
+     * @param {Object} slave
      */
-    one: function(type, listener, context) {
+    one: function(type, listener, slave) {
         var that = this;
 
         cool.assert(typeof listener === 'function',
@@ -173,10 +188,10 @@ var events = {
 
         var proxy = function() {
             listener.apply(this, arguments);
-            that.off(type, proxy, context);
+            that.off(type, proxy, slave);
         };
 
-        this.on(type, proxy, context);
+        this.on(type, proxy, slave);
 
         return this;
     },
@@ -188,6 +203,7 @@ var events = {
      * @param {Object} data
      */
     emit: function(event, data) {
+        var that = this;
         var events = this._events;
 
         if (typeof event === 'string') {
@@ -197,7 +213,9 @@ var events = {
         events = events && events[event.type];
 
         xtnd.each(events, function(item) {
-            item.listener.call(item.context, event, data);
+            if (item.slave === '*' || event.slave === item.slave) {
+                item.listener.call(that, event, data);
+            }
         });
 
     }

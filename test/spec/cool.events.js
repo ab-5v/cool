@@ -11,7 +11,8 @@ describe('cool.events', function() {
             var event = this.emitter._event('hello');
 
             expect( event ).to.have.property( 'type', 'hello' );
-            expect( event ).to.have.property( 'owner', this.emitter );
+            expect( event ).to.have.property( 'slave', undefined );
+            expect( event ).to.have.property( 'emitter', this.emitter );
             expect( event ).to.have.property( '_prevented', false );
             expect( event.preventDefault ).to.be.a( Function );
         });
@@ -19,6 +20,11 @@ describe('cool.events', function() {
         it('should extend event by `extra`', function() {
             expect( this.emitter._event('hello', {a: 1}) )
                 .to.have.property( 'a', 1 );
+        });
+
+        it('should overwrite by `extra`', function() {
+            expect( this.emitter._event('hello', {slave: 'slave'}) )
+                .to.have.property( 'slave', 'slave' );
         });
 
         it('should preventDefault', function() {
@@ -68,18 +74,18 @@ describe('cool.events', function() {
                 .to.eql( this.listener );
         });
 
-        it('should add context to the store', function() {
+        it('should add slave to the store', function() {
             this.emitter.on('hello', this.listener, {a: 1});
 
-            expect( this.emitter._events.hello[0].context )
+            expect( this.emitter._events.hello[0].slave )
                 .to.eql( {a: 1} );
         });
 
-        it('should add `this` as a context if not specified', function() {
+        it('should add `*` as a slave if not specified', function() {
             this.emitter.on('hello', this.listener);
 
-            expect( this.emitter._events.hello[0].context )
-                .to.eql( this.emitter );
+            expect( this.emitter._events.hello[0].slave )
+                .to.eql( '*' );
         });
 
         it('should return `this`', function() {
@@ -96,17 +102,14 @@ describe('cool.events', function() {
             this.f1 = function() {};
             this.f2 = function() {};
 
-            this.ctx1 = {};
-            this.ctx2 = {};
-
             this.emitter._events = {
                 hello: [
-                    {listener: this.f1},
-                    {listener: this.f2, context: this.ctx1}
+                    {listener: this.f1, slave: '*'},
+                    {listener: this.f2, slave: 'ns1'}
                 ],
                 aloha: [
-                    {listener: this.f2},
-                    {listener: this.f1, context: this.ctx2}
+                    {listener: this.f2, slave: '*'},
+                    {listener: this.f1, slave: 'ns2'}
                 ]
             };
 
@@ -134,8 +137,8 @@ describe('cool.events', function() {
             expect( this.events.aloha.length ).to.eql( 1 );
         });
 
-        it('should remove by context', function() {
-            this.emitter.off(null, null, this.ctx1);
+        it('should remove by slave', function() {
+            this.emitter.off(null, null, 'ns1');
 
             expect( this.events.hello.length ).to.eql( 1 );
             expect( this.events.aloha.length ).to.eql( 2 );
@@ -148,15 +151,15 @@ describe('cool.events', function() {
             expect( this.events.aloha.length ).to.eql( 2 );
         });
 
-        it('should remove by type and context', function() {
-            this.emitter.off('hello', null, this.ctx1);
+        it('should remove by type and slave', function() {
+            this.emitter.off('hello', null, 'ns1');
 
             expect( this.events.hello.length ).to.eql( 1 );
             expect( this.events.aloha.length ).to.eql( 2 );
         });
 
-        it('should remove by listener and context', function() {
-            this.emitter.off(null, this.f2, this.ctx1);
+        it('should remove by listener and slave', function() {
+            this.emitter.off(null, this.f2, 'ns1');
 
             expect( this.events.hello.length ).to.eql( 1 );
             expect( this.events.aloha.length ).to.eql( 2 );
@@ -194,24 +197,13 @@ describe('cool.events', function() {
             expect( this.listener.calledOnce ).to.be.ok();
         });
 
-        it('should emit only once by listener and context', function() {
-            this.emitter.one('hello', this.listener, {a: 1});
+        it('should emit only one by listener and slave', function() {
+            this.emitter.one('hello', this.listener, 'sl1');
 
-            this.emitter.emit('hello');
-            this.emitter.emit('hello');
+            this.emitter.emit(this.emitter._event('hello', {slave: 'sl1'}));
+            this.emitter.emit(this.emitter._event('hello', {slave: 'sl1'}));
 
             expect( this.listener.calledOnce ).to.be.ok();
-        });
-
-        it('should emit with specified context', function(done) {
-            var emitter = this.emitter;
-            emitter.one('hello', function() {
-
-                expect( this ).to.eql( {a: 1} );
-                done();
-            }, {a: 1});
-
-            emitter.emit('hello');
         });
 
         it('should return `this`', function() {
@@ -230,17 +222,14 @@ describe('cool.events', function() {
             this.f3 = sinon.spy();
             this.f4 = sinon.spy();
 
-            this.ctx1 = {};
-            this.ctx2 = {};
-
             this.emitter._events = {
                 hello: [
-                    {listener: this.f1},
-                    {listener: this.f2, context: this.ctx1}
+                    {listener: this.f1, slave: '*'},
+                    {listener: this.f2, slave: 'sl1'}
                 ],
                 aloha: [
-                    {listener: this.f3},
-                    {listener: this.f4, context: this.ctx2}
+                    {listener: this.f3, slave: 'sl1'},
+                    {listener: this.f4, slave: 'sl2'}
                 ]
             };
 
@@ -257,13 +246,31 @@ describe('cool.events', function() {
                 .to.eql( 'hello' );
         });
 
-        it('should call every listener of specified type', function() {
+        it('should call every `*` listener of specified type', function() {
             this.emitter.emit('hello');
 
             expect( this.f1.calledOnce ).to.be.ok();
-            expect( this.f2.calledOnce ).to.be.ok();
+            expect( this.f2.called ).not.to.be.ok();
 
             expect( this.f3.called ).not.to.be.ok();
+            expect( this.f4.called ).not.to.be.ok();
+        });
+
+        it('should call all matched and `*` slave listeners', function() {
+            var event = this.emitter._event('hello', {slave: 'sl1'});
+
+            this.emitter.emit( event );
+
+            expect( this.f1.calledOnce ).to.be.ok();
+            expect( this.f2.calledOnce ).to.be.ok();
+        });
+
+        it('should call only matched slave listeners', function() {
+            var event = this.emitter._event('aloha', {slave: 'sl1'});
+
+            this.emitter.emit( event );
+
+            expect( this.f3.calledOnce ).to.be.ok();
             expect( this.f4.called ).not.to.be.ok();
         });
 
@@ -281,16 +288,6 @@ describe('cool.events', function() {
                 .to.eql( {a: 1} );
         });
 
-        it('should set context of listener', function(done) {
-            this.emitter.on('hello', function() {
-
-                expect( this ).to.eql( {a: 2} );
-                done();
-
-            }, {a: 2});
-
-            this.emitter.emit('hello');
-        });
 
     });
 
