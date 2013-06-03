@@ -14,6 +14,7 @@ describe('cool.events', function() {
             expect( event ).to.have.property( 'slave', undefined );
             expect( event ).to.have.property( 'emitter', this.emitter );
             expect( event ).to.have.property( '_prevented', false );
+            expect( event.operation ).to.eql( {} );
             expect( event.preventDefault ).to.be.a( Function );
         });
 

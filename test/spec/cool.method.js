@@ -163,6 +163,47 @@ describe('cool.method', function() {
         expect( this.aim.tested ).to.eql( 3 );
     });
 
+    it('should set `operation` object', function(done) {
+        this.aim.op = cool.method('op', function() {
+            expect( this.operation ).to.eql( {} );
+            done();
+        });
+
+        this.aim.op();
+    });
+
+    it('should clear `operation` object', function() {
+        this.aim.test();
+
+        expect( this.aim.operation ).to.be( undefined );
+    });
+
+    it('should pass `operation` through events', function(done) {
+        this.aim.op = cool.method('op', function() {
+            expect( this.operation ).to.eql( {e1: 1, e2: 2} );
+            done();
+        });
+
+        this.aim.on('op', function(evt) {
+            evt.operation.e1 = 1;
+        });
+
+        this.aim.on('op', function(evt) {
+            evt.operation.e2 = 2;
+        });
+
+        this.aim.op();
+    });
+
+    it('should pass `opeartion` to `-ed` event', function(done) {
+        this.aim.on('tested', function(evt) {
+            expect( evt.operation ).to.eql( {} );
+            done();
+        });
+
+        this.aim.test();
+    });
+
     describe('bindAction', function() {
 
         it('should return function', function() {
