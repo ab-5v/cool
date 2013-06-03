@@ -725,6 +725,9 @@ cool.method(cool.view.prototype, {
     append: function(view) {
         var name = view.name;
         var views = this._views;
+        var op = this.operation;
+        var root = op.root ?
+            this.el.find(op.root) : this.el;
 
         if (!views[name]) {
             views[name] = [];
@@ -734,7 +737,7 @@ cool.method(cool.view.prototype, {
             view.detach(true);
         }
 
-        this.el.append(view.el);
+        root.append(view.el);
         view._parent = this;
         views[name].push(view);
     },

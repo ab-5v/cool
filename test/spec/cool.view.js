@@ -152,6 +152,11 @@ describe('cool.view', function() {
     describe('append', function() {
 
         beforeEach(function() {
+            cool.view.prototype.html = function() {
+                return  '<i class="' + this.name + '">' +
+                            '<i class="' + this.name + '__i"></i>' +
+                        '</i>';
+            };
             this.view = cool.view('v1');
             this.v201 = cool.view('v2');
             this.v202 = cool.view('v2');
@@ -196,7 +201,17 @@ describe('cool.view', function() {
         it('should append dom element', function() {
             this.view.append(this.v202);
 
-            expect( this.view.el.find( this.v202.el ).length ).to.eql( 1 );
+            expect( this.view.el.children( '.v2' ).length ).to.eql( 1 );
+        });
+
+        it('should consider `operation.root`', function() {
+            this.view.on('append', function(evt) {
+                evt.operation.root = '.v1__i';
+            });
+
+            this.view.append(this.v202);
+
+            expect( this.view.el.find('.v1__i > .v2' ).length ).to.eql( 1 );
         });
 
     });
