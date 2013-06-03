@@ -2,7 +2,7 @@ describe('store', function() {
 
     beforeEach(function() {
         this.aim = {};
-        xtnd(this.aim, cool.store('data'));
+        xtnd(this.aim, cool.events, cool.store('data'));
         this.aim._data = {};
     });
 
@@ -120,6 +120,13 @@ describe('store', function() {
 
         expect( this.aim.data(false, 'a', 2) )
             .to.eql( {before: {a: [1, 2, 3]}, after: {a: [1, 3]}} );
+    });
+
+    it('should throw on wrong format', function() {
+        var aim = this.aim;
+
+        expect( function() { aim.data(false, {}); } )
+            .to.throwError(/unsupported arguments/i);
     });
 
 });
