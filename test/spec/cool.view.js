@@ -96,9 +96,9 @@ describe('cool.view', function() {
 
         beforeEach(function() {
             this.view = new cool.view();
-            this.view.param('a');
+            this.view.param({a: 'a'});
             this.view.html = function(json) {
-                return '<i>' + json.params + '</i><b>123</b>';
+                return '<i>' + json.params.a + '</i><b>123</b>';
             };
             sinon.spy(this.view, 'html');
             sinon.spy(this.view, 'toJSON');
@@ -140,7 +140,7 @@ describe('cool.view', function() {
 
             var el = this.view.el[0];
 
-            this.view.param('b');
+            this.view.param({a: 'b'});
             this.view.render();
 
             expect( this.view.el[0] ).to.eql( el );
