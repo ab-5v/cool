@@ -91,6 +91,10 @@ var store = function(name) {
             before: before,
             after: after
         };
+    // silent
+    }, function(arg) {
+        var len = arguments.length;
+        return !len || len === 1 && typeof arg === 'string';
     });
 
     return mixin;
