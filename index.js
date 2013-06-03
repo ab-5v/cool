@@ -375,7 +375,7 @@ function preventDefault() {
 ;(function() {
 
 
-var method = function(name, action) {
+var method = function(name, action, isSilent) {
 
     if ( xtnd.isObject(name) ) {
         return method.extend(name, action);
@@ -386,26 +386,32 @@ var method = function(name, action) {
         var that = this;
         var args = xtnd.array(arguments);
         var slave = args[0] instanceof cool ? args[0].name : undefined;
+        var silent = typeof isSilent === 'function' ?
+            isSilent.apply(this, args) : false;
 
         // console.log(this.name + ' -> ' + name, slave);
 
         binded = method.bindAction(action, this, args);
-        event = this._event(name, {action: binded, slave: slave});
-        op = this.operation = event.operation;
 
-        this.emit(event);
+        if (!silent) {
+            event = this._event(name, {action: binded, slave: slave});
+            op = this.operation = event.operation;
+            this.emit(event);
+        }
 
-        if (!event._prevented) {
+        if (!event || !event._prevented) {
 
             reply = binded();
-            event = this._event(name + 'ed', {operation: op, slave: slave});
 
-            if (cool.promise.is(reply)) {
-                reply.then(function(data) {
-                    that.emit(event, data);
-                });
-            } else {
-                this.emit(event, reply);
+            if (!silent) {
+                event = this._event(name + 'ed', {operation: op, slave: slave});
+                if (cool.promise.is(reply)) {
+                    reply.then(function(data) {
+                        that.emit(event, data);
+                    });
+                } else {
+                    this.emit(event, reply);
+                }
             }
         }
 

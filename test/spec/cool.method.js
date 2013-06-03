@@ -106,6 +106,28 @@ describe('cool.method', function() {
         this.aim.test(inst);
     });
 
+    it('should not emit if `silent` is true', function() {
+        this.aim.emit = sinon.spy();
+        this.aim.silent = method('silent',
+            function() {}, function() { return true; });
+        this.aim.silent();
+
+        expect( this.aim.emit.called ).not.to.be.ok();
+    });
+
+    it('should pass arguments to `silent`', function(done) {
+
+        this.aim.silent = method('silent', function() {},
+            function(a, b) {
+
+                expect( a ).to.eql( {a: 1} );
+                expect( b ).to.eql( 4 );
+                done();
+            });
+
+        this.aim.silent({a: 1}, 4);
+    });
+
     it('should prevent `action` by preventDefault', function() {
         this.aim.on('test', function(evt) {
             evt.preventDefault();
