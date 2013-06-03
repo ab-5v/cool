@@ -25,9 +25,9 @@ var store = function(name) {
         }
 
         // setters
-        keys = store.keys(args, typ);
+        keys = store.keys(args, data, typ);
 
-        before = store.collect(data, keys);
+        before = store.collect(this['_' + name], keys);
 
         if (len > 3) {
             store.wrong(name, args);
@@ -81,15 +81,28 @@ var store = function(name) {
 };
 
 xtnd(store, {
-    keys: function(args, typ) {
-        var keys = args[ typ === 'boolean' ? 1 : 0 ];
+    keys: function(args, data, typ) {
+        var keys, len = args.length;
 
-        return typeof keys === 'object' ?
-            xtnd.keys(keys) : [keys];
+        if (typ === 'object') {
+            keys = xtnd.keys(data).concat( xtnd.keys(args[0]) );
+        } else if ( typ === 'boolean') {
+            if (len === 1) {
+                keys = xtnd.keys(data);
+            } else {
+                keys = typeof args[1] === 'object' ?
+                    xtnd.keys(args[1]) : [args[1]];
+            }
+        } else {
+            keys = [ args[0] ];
+        }
+
+        return keys;
     },
     collect: function(data, keys) {
-        return xtnd.map(data, function(v, key) {
-            return keys.indexOf(key) > -1;
+        return xtnd.map(data, function(val, key) {
+            return keys.indexOf(key) > -1 ?
+                val : undefined;
         });
     },
     wrong: function(name, args) {

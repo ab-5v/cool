@@ -73,4 +73,53 @@ describe('store', function() {
         expect( this.aim.data('a') ).to.eql( 3 );
     });
 
+    it('should return before/after for data({})', function() {
+        this.aim.data({a: 3});
+
+        expect( this.aim.data({b: 2}) )
+            .to.eql( {before: {a: 3}, after: {b: 2}} );
+    });
+
+    it('should return before/after for data(true, {})', function() {
+        this.aim.data({a: 3});
+
+        expect( this.aim.data(true, {b: 2}) )
+            .to.eql( { before: {}, after: {b: 2} });
+    });
+
+    it('should return before/after for data(name, value)', function() {
+        this.aim.data({a: 3});
+
+        expect( this.aim.data('a', 4) )
+            .to.eql( {before: {a: 3}, after: {a: 4}} );
+    });
+
+    it('should return before/after for data(true, name, value)', function() {
+        this.aim.data({a: [1, 2]});
+
+        expect( this.aim.data(true, 'a', 3) )
+            .to.eql( {before: {a: [1, 2]}, after: {a: [1, 2, 3]}} );
+    });
+
+    it('should return before/after for data(false)', function() {
+        this.aim.data({a: 1});
+
+        expect( this.aim.data(false) )
+            .to.eql( {before: {a: 1}, after: {}} );
+    });
+
+    it('should return before/after for data(false, name)', function() {
+        this.aim.data({a: 1, b: 2});
+
+        expect( this.aim.data(false, 'b') )
+            .to.eql( {before: {b: 2}, after: {}} );
+    });
+
+    it('should return before/after for data(false, name, value)', function() {
+        this.aim.data({a: [1, 2, 3]});
+
+        expect( this.aim.data(false, 'a', 2) )
+            .to.eql( {before: {a: [1, 2, 3]}, after: {a: [1, 3]}} );
+    });
+
 });
