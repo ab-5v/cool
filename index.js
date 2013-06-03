@@ -259,7 +259,7 @@ var method = function(name, action) {
         if (!event._prevented) {
 
             reply = binded();
-            event = this._event(name + 'ed', {operation: op});
+            event = this._event(name + 'ed', {operation: op, slave: slave});
 
             if (cool.promise.is(reply)) {
                 reply.then(function(data) {

@@ -94,6 +94,18 @@ describe('cool.method', function() {
         this.aim.test();
     });
 
+    it('should emit after `action` with slave', function(done) {
+        var inst = new cool.view(); inst.name = 'foo';
+
+        this.aim.on('tested', function(evt) {
+
+            expect( evt.slave ).to.eql( 'foo' );
+            done();
+        });
+
+        this.aim.test(inst);
+    });
+
     it('should prevent `action` by preventDefault', function() {
         this.aim.on('test', function(evt) {
             evt.preventDefault();
