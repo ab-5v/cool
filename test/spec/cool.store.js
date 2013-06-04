@@ -122,6 +122,23 @@ describe('store', function() {
             .to.eql( {before: {a: [1, 2, 3]}, after: {a: [1, 3]}} );
     });
 
+    it('should emit on data write', function() {
+        sinon.spy(this.aim, 'emit');
+
+        this.aim.data({a: 1});
+
+        expect( this.aim.emit.calledTwice ).to.be.ok();
+    });
+
+    it('should not emit on data read', function() {
+        sinon.spy(this.aim, 'emit');
+
+        this.aim.data();
+        this.aim.data('foo');
+
+        expect( this.aim.called ).not.to.be.ok();
+    });
+
     it('should throw on wrong format', function() {
         var aim = this.aim;
 

@@ -25,7 +25,7 @@ var store = function(name) {
      * Returns data for getters
      * changes object for setters
      */
-    mixin[name] = cool.method('name', function() {
+    mixin[name] = cool.method(name, function() {
         var keys, before, after;
         var args = arguments;
         var data = this['_' + name];
