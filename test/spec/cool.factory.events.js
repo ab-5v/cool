@@ -190,7 +190,7 @@ describe('cool.factory.events', function() {
 
         it('should process existing views', function() {
             var spy = sinon.spy();
-            cool.view._insts = [{name: 'ev', on: spy}];
+            cool.view._insts = {ev: [{on: spy}]};
             events.on(this.view, [this.ev]);
 
             expect( spy.calledOnce ).to.be.ok();
@@ -204,7 +204,7 @@ describe('cool.factory.events', function() {
 
         it('should process existing models', function() {
             var spy = sinon.spy();
-            cool.model._insts = [{name: 'em', on: spy}];
+            cool.model._insts = {em: [{on: spy}]};
             events.on(this.view, [this.em]);
 
             expect( spy.calledOnce ).to.be.ok();

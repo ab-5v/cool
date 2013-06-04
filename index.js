@@ -665,7 +665,7 @@ var events = {
         xtnd.each(parsed, function(info) {
             if (!(/view|model/).test(info.kind)) { return; }
 
-            var store = cool[info.kind]._insts;
+            var store = cool[info.kind]._insts || {};
 
             if (info.master === 'this') {
                 // bind event only for current view
@@ -673,10 +673,8 @@ var events = {
             } else {
 
                 // bind current event to existing views and models
-                xtnd.each(store, function(inst) {
-                    if (inst.name === info.master) {
-                        inst.on(info.type, info.listener, info.slave);
-                    }
+                xtnd.each(store[info.master], function(inst) {
+                    inst.on(info.type, info.listener, info.slave);
                 });
 
                 that.store(view, info);
