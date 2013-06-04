@@ -17,6 +17,6 @@ node_modules: package.json
 	npm install
 
 bower_modules: bower.json
-	bower install
+	$(NBIN)/bower install
 
 .PHONY: clean test

@@ -24,7 +24,8 @@
         "phantomjs": "*",
         "mocha-phantomjs": "*",
         "nodemon": "*",
-        "jshint": "*"
+        "jshint": "*",
+        "bower": "*"
     },
     "private": true
 }
