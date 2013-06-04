@@ -911,6 +911,8 @@ cool.method(cool.view.prototype, {
         root.append(view.el);
         view._parent = this;
         views[name].push(view);
+
+        return view;
     },
 
     /**

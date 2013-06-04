@@ -239,6 +239,10 @@ describe('cool.view', function() {
             expect( this.view.el.find('.v1__i > .v2' ).length ).to.eql( 1 );
         });
 
+        it('should return apended instance', function() {
+            expect( this.view.append( this.v202 ) ).to.eql( this.v202 );
+        });
+
     });
 
     describe('detach', function() {
