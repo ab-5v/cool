@@ -74,6 +74,31 @@ describe('cool.view', function() {
 
     });
 
+    describe('find', function() {
+
+        beforeEach(function() {
+            this.view = cool.view('v1');
+            this.v201 = cool.view('v2');
+            this.v202 = cool.view('v2');
+
+            this.view.append( this.v201 );
+            this.view.append( this.v202 );
+        });
+
+        it('should find subview by instance', function() {
+            expect( this.view.find(this.v202) ).to.eql( this.v202 );
+        });
+
+        it('should find first subview by name', function() {
+            expect( this.view.find('v2') ).to.eql( this.v201 );
+        });
+
+        it('should return undefined if no one found', function() {
+            expect( this.view.find('v3') ).to.be( undefined );
+        });
+
+    });
+
     describe('toJSON', function() {
 
         beforeEach(function() {
