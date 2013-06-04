@@ -763,6 +763,7 @@ var events = {
         'focus',
         'focusin',
         'focusout',
+        'input',
         'keydown',
         'keypress',
         'keyup',
