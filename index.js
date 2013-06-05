@@ -927,7 +927,8 @@ cool.method(cool.view.prototype, {
         cool.assert(this._parent,
             'detach for %1 called w/o _parent', this.name);
 
-        var views = this._parent._views[this.name];
+        var parent = this._parent;
+        var views = parent._views[this.name];
         var index = views.indexOf(this);
 
         if (index > -1) {
@@ -943,6 +944,8 @@ cool.method(cool.view.prototype, {
         if (!skipDom) {
             this.el.detach();
         }
+
+        return parent;
     },
 
     /**

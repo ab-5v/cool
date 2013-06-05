@@ -297,6 +297,11 @@ describe('cool.view', function() {
             expect( this.view.el.find( this.v202.el ).length ).to.eql( 1 );
         });
 
+        it('should return parent', function() {
+
+            expect( this.v201.detach() ).to.eql( this.view );
+        });
+
     });
 
     describe('remove', function() {
