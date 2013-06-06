@@ -1,12 +1,12 @@
 describe('cool.model', function() {
 
-    describe('init', function() {
+    beforeEach(function() {
+        this.model = new cool.model();
+        this.model.url = '/test';
+        this.model.name = 'test';
+    });
 
-        beforeEach(function() {
-            this.model = new cool.model();
-            this.model.url = '/test';
-            this.model.name = 'test';
-        });
+    describe('init', function() {
 
         it('should throw if no url specified', function() {
             var model = new cool.model();
@@ -135,11 +135,6 @@ describe('cool.model', function() {
     });
 
     describe('_params', function() {
-
-        beforeEach(function() {
-            this.model = new cool.model();
-            this.model.url = '/test';
-        });
 
         it('should return null on required absense', function() {
             this.model.params = {req: null};
