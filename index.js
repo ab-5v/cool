@@ -1063,6 +1063,10 @@ cool.method(cool.model.prototype, {
         this.data(data);
         this.param(params);
 
+        if (!('bibb' in this)) {
+            this.bibb = this.name.slice(-1) === 's' ? [] : {};
+        }
+
         return this;
     },
 

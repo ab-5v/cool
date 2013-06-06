@@ -5,6 +5,7 @@ describe('cool.model', function() {
         beforeEach(function() {
             this.model = new cool.model();
             this.model.url = '/test';
+            this.model.name = 'test';
         });
 
         it('should throw if no url specified', function() {
@@ -24,6 +25,26 @@ describe('cool.model', function() {
             this.model.init({b: 2}, {});
 
             expect( this.model.param() ).to.eql( {b: 2} );
+        });
+
+        it('should save bibb', function() {
+            this.model.bibb = 123;
+            this.model.init({}, {});
+
+            expect( this.model.bibb ).to.eql( 123 );
+        });
+
+        it('should set bibb', function() {
+            this.model.init({}, {});
+
+            expect( this.model.bibb ).to.eql( {} );
+        });
+
+        it('should set plural bibb', function() {
+            this.model.name = 'tests';
+            this.model.init({}, {});
+
+            expect( this.model.bibb ).to.eql( [] );
         });
 
         it('should return `this`', function() {
