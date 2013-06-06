@@ -25,7 +25,8 @@
         "mocha-phantomjs": "*",
         "nodemon": "*",
         "jshint": "*",
-        "bower": "*"
+        "bower": "*",
+        "json2htmlcov": "*"
     },
     "private": true
 }
