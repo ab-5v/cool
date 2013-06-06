@@ -253,14 +253,24 @@ describe('cool.model', function() {
         it('should set cache item', function() {
             this.model.cache({b: 1}, [4, 5, 6]);
 
-            expect( this.model._cache['test?b=1'] ).to.eql( [4, 5, 6] );
+            expect( this.model.cache({b: 1}) ).to.eql( [4, 5, 6] );
+        });
+
+        it('should should add to cache', function() {
+            this.model.cache({b: 1}, [4, 5, 6]);
+
+            expect( this.model.cache({a: 1}) ).to.eql( [1, 2, 3] );
         });
     });
 
     describe('request', function() {
 
-        beforeEach(function() { sinon.spy($, 'ajax'); });
-        afterEach(function() { $.ajax.restore(); });
+        beforeEach(function() {
+            sinon.spy($, 'ajax');
+        });
+        afterEach(function() {
+            $.ajax.restore();
+        });
 
         it('should abort existing request', function() {
             var abort = sinon.spy();
@@ -285,6 +295,68 @@ describe('cool.model', function() {
 
         it('should return $.ajax() object', function() {
             expect( this.model.request() ).to.be.an( Object );
+        });
+
+    });
+
+    describe('sync', function() {
+
+        beforeEach(function() {
+            this.model.request = function(options) {
+                return {
+                    done: function(cb) {
+                        cb.call(options.context, {r: 1});
+                    }
+                };
+            };
+
+            sinon.stub($, 'ajax');
+        });
+
+        afterEach(function() {
+            $.ajax.restore();
+        });
+
+        it('should return promise', function() {
+            expect( cool.promise.is(this.model.sync()) )
+                .to.be.ok();
+        });
+
+        it('should resolve with bibb for no params', function(done) {
+            var bibb = this.model.bibb;
+            this.model.params = {req: null};
+            this.model.sync()
+                .then(function(data) {
+                    expect( data ).to.eql( bibb );
+                    done();
+                });
+        });
+
+        it('should resolve with cache', function(done) {
+            this.model.params = {a: undefined};
+            this.model.cache({a: 1}, [1,2,3]);
+            this.model.sync({data: {a: 1}})
+                .then(function(data) {
+                    expect( data ).to.eql( [1,2,3] );
+                    done();
+                });
+        });
+
+        it('should cache result', function(done) {
+            var model = this.model;
+            this.model.sync()
+                .then(function() {
+                    expect( model.cache({}) ).to.eql( {r: 1} );
+                    done();
+                });
+        });
+
+        it('should resolve with data', function(done) {
+            this.model.sync()
+                .then(function(data) {
+                    expect( data ).to.eql( {r: 1} );
+                    done();
+                });
         });
 
     });

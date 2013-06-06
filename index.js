@@ -1107,6 +1107,40 @@ cool.factory('model', {
             .always(function() { this._request = undefined; });
 
         return this._request;
+    },
+
+    /**
+     * Syncronizes data with server
+     *
+     * @param {Object} options
+     */
+    sync: function(options) {
+        options = options || {};
+        options.data = options.data || {};
+
+        var promise = cool.promise();
+        var params = this._params(options.data);
+
+        if (!params) {
+            return promise.resolve(this.bibb);
+        }
+
+        options = xtnd(this.defaults(), options);
+        options.data = params;
+
+        var cache = this.cache(params);
+        if (cache) {
+            return promise.resolve(cache);
+        }
+
+        this.request(options)
+            .done(function(data) {
+                this.cache(params, data);
+
+                promise.resolve(data);
+            });
+
+        return promise;
     }
 });
 
