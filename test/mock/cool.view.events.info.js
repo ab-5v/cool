@@ -31,9 +31,9 @@ root.cool_view_events_info = {
         master: 'form',
         context: 'this'
     },
-    'model -> read': {
+    'model -> fetch': {
         kind: 'model',
-        type: 'read',
+        type: 'fetch',
         slave: '',
         master: 'model',
         context: ''
