@@ -1026,6 +1026,14 @@ cool.view.init = init;
 ;(function() {
 
 cool.factory('model', {
+
+    /**
+     * Resolves `params` by one specified on model defenition
+     *
+     * @param {Object} params
+     *
+     * @returns Object
+     */
     _params: function(params) {
         var res = {};
 
