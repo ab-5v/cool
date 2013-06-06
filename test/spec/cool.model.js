@@ -194,4 +194,18 @@ describe('cool.model', function() {
 
     });
 
+    describe('key', function() {
+
+        it('should create key by name', function() {
+
+            expect( this.model.key({}) ).to.eql( 'test' );
+        });
+
+        it('should create key by name and params', function() {
+
+            expect( this.model.key({a: [1, 2], b: 3}) )
+                .to.eql( 'test?a=1&a=2&b=3' );
+        });
+    });
+
 });

@@ -1049,7 +1049,13 @@ cool.factory('model', {
         });
 
         return res;
+    },
+
+    key: function(params) {
+        var key = $.param(params, true);
+        return this.name + (key ? '?' : '') + key;
     }
+
 });
 
 cool.model._cache = {};
