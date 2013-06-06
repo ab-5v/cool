@@ -5,7 +5,25 @@ describe('cool.model', function() {
         this.model.url = '/test';
         this.model.name = 'test';
         this.model._cache = {};
+
+        var requests = this.requests = [];
+
+        this.xhr = sinon.useFakeXMLHttpRequest();
+        this.xhr.onCreate = function (xhr) {
+            requests.push(xhr);
+            setTimeout(function() {
+                xhr.respond(200,
+                    { 'Content-Type': 'application/json' },
+                    '{ "user": "artjock" }'
+                );
+            }, 10);
+        };
     });
+
+    afterEach(function() {
+        this.xhr.restore();
+    });
+
 
     describe('init', function() {
 
@@ -57,86 +75,6 @@ describe('cool.model', function() {
         it('should return `this`', function() {
 
             expect( this.model.init({}, {}) ).to.eql( this.model );
-        });
-
-    });
-
-    describe('fetch', function() {
-
-        beforeEach(function() {
-
-            var requests = this.requests = [];
-
-            this.xhr = sinon.useFakeXMLHttpRequest();
-            this.xhr.onCreate = function (xhr) {
-                requests.push(xhr);
-                setTimeout(function() {
-                    xhr.respond(200,
-                        { 'Content-Type': 'application/json' },
-                        '{ "user": "artjock" }'
-                    );
-                }, 10);
-            };
-
-            this.model = new cool.model({a: 1}, {b: 2});
-            this.model.url = '/test';
-        });
-
-        afterEach(function() {
-            this.xhr.restore();
-        });
-
-        it('should call server once', function() {
-            this.model.fetch();
-
-            expect( this.requests.length ).to.eql( 1 );
-        });
-
-        it('should call server with `this.url`', function() {
-            this.model.fetch();
-
-            expect( this.requests[0].url ).to.eql( '/test' );
-        });
-
-        it('should call server with "GET" method', function() {
-            this.model.fetch();
-
-            expect( this.requests[0].method ).to.eql( 'GET' );
-        });
-
-        it('should return promise', function() {
-            expect( cool.promise.is( this.model.fetch() ) ).to.be.ok();
-        });
-
-        it('should resolve with model', function(done) {
-            var model = this.model;
-
-            model.fetch()
-                .then(function(res) {
-                    expect( res ).to.equal( model );
-                    done();
-                });
-        });
-
-        it('should save returned data', function(done) {
-            var model = this.model;
-
-            model.fetch()
-                .then(function() {
-                    expect( model.data() ).to.eql( {user: 'artjock'} );
-                    done();
-                });
-        });
-
-        it('should emit with model', function(done) {
-            var model = this.model;
-
-            model.on('fetched', function(evt, res) {
-                expect( res ).to.equal( model );
-                done();
-            });
-
-            model.fetch();
         });
 
     });
@@ -268,6 +206,7 @@ describe('cool.model', function() {
         beforeEach(function() {
             sinon.spy($, 'ajax');
         });
+
         afterEach(function() {
             $.ajax.restore();
         });
@@ -301,22 +240,6 @@ describe('cool.model', function() {
 
     describe('sync', function() {
 
-        beforeEach(function() {
-            this.model.request = function(options) {
-                return {
-                    done: function(cb) {
-                        cb.call(options.context, {r: 1});
-                    }
-                };
-            };
-
-            sinon.stub($, 'ajax');
-        });
-
-        afterEach(function() {
-            $.ajax.restore();
-        });
-
         it('should return promise', function() {
             expect( cool.promise.is(this.model.sync()) )
                 .to.be.ok();
@@ -346,7 +269,7 @@ describe('cool.model', function() {
             var model = this.model;
             this.model.sync()
                 .then(function() {
-                    expect( model.cache({}) ).to.eql( {r: 1} );
+                    expect( model.cache({}) ).to.eql( {user: 'artjock'} );
                     done();
                 });
         });
@@ -354,9 +277,27 @@ describe('cool.model', function() {
         it('should resolve with data', function(done) {
             this.model.sync()
                 .then(function(data) {
-                    expect( data ).to.eql( {r: 1} );
+                    expect( data ).to.eql( {user: 'artjock'} );
                     done();
                 });
+        });
+
+        it('should call server once', function() {
+            this.model.sync();
+
+            expect( this.requests.length ).to.eql( 1 );
+        });
+
+        it('should call server with `this.url`', function() {
+            this.model.sync();
+
+            expect( this.requests[0].url ).to.eql( '/test' );
+        });
+
+        it('should call server with "GET" method', function() {
+            this.model.sync();
+
+            expect( this.requests[0].method ).to.eql( 'GET' );
         });
 
     });
