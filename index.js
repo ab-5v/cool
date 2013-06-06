@@ -1030,6 +1030,8 @@ cool.factory('model', {
     /**
      * Resolves `params` by one specified on model defenition
      *
+     * @private
+     *
      * @param {Object} params
      *
      * @returns Object
@@ -1051,6 +1053,13 @@ cool.factory('model', {
         return res;
     },
 
+    /**
+     * Generates unique key for current model
+     *
+     * @param {Object} params
+     *
+     * @returns String
+     */
     key: function(params) {
         var key = $.param(params, true);
         return this.name + (key ? '?' : '') + key;
