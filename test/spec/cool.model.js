@@ -208,4 +208,23 @@ describe('cool.model', function() {
         });
     });
 
+    describe('defaults', function() {
+
+        it('should return defaults object', function() {
+            var defaults = this.model.defaults();
+
+            expect( defaults ).to.have.property( 'url', '/test' );
+            expect( defaults ).to.have.property( 'type', 'get' );
+            expect( defaults ).to.have.property( 'context', this.model );
+            expect( defaults ).to.have.property( 'dataType', 'json' );
+        });
+
+        it('should return different objects', function() {
+            this.model.defaults().url = 'foo';
+
+            expect( this.model.defaults() ).to.have.property( 'url', '/test' );
+        });
+
+    });
+
 });

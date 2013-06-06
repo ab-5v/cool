@@ -1063,8 +1063,21 @@ cool.factory('model', {
     key: function(params) {
         var key = $.param(params, true);
         return this.name + (key ? '?' : '') + key;
-    }
+    },
 
+    /**
+     * Some default for $.ajax
+     *
+     * @returns Object
+     */
+    defaults: function() {
+        return {
+            url: this.url,
+            type: 'get',
+            context: this,
+            dataType: 'json'
+        };
+    }
 });
 
 cool.model._cache = {};
