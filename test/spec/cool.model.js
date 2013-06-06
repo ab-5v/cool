@@ -227,4 +227,27 @@ describe('cool.model', function() {
 
     });
 
+    describe('cache', function() {
+
+        beforeEach(function() {
+            this.model._cache = { 'test?a=1': [1, 2, 3] };
+        });
+
+        it('should return existing cache item', function() {
+
+            expect( this.model.cache({a: 1}) ).to.eql( [1, 2, 3] );
+        });
+
+        it('should return undefined for unexisting cache', function() {
+
+            expect( this.model.cache({a: 2}) ).to.eql( undefined );
+        });
+
+        it('should set cache item', function() {
+            this.model.cache({b: 1}, [4, 5, 6]);
+
+            expect( this.model._cache['test?b=1'] ).to.eql( [4, 5, 6] );
+        });
+    });
+
 });

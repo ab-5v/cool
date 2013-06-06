@@ -1077,6 +1077,16 @@ cool.factory('model', {
             context: this,
             dataType: 'json'
         };
+    },
+
+    cache: function(params, data) {
+        var key = this.key(params);
+
+        if (data) {
+            this._cache[key] = data;
+        } else {
+            return this._cache[key];
+        }
     }
 });
 
