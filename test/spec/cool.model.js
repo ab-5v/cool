@@ -4,6 +4,7 @@ describe('cool.model', function() {
         this.model = new cool.model();
         this.model.url = '/test';
         this.model.name = 'test';
+        this.model._cache = {};
     });
 
     describe('init', function() {
@@ -45,6 +46,12 @@ describe('cool.model', function() {
             this.model.init({}, {});
 
             expect( this.model.bibb ).to.eql( [] );
+        });
+
+        it('should initialize _cache', function() {
+            this.model.init({}, {});
+
+            expect( this.model._cache ).to.eql( {} );
         });
 
         it('should return `this`', function() {
