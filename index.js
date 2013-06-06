@@ -1025,7 +1025,26 @@ cool.view.init = init;
     /* cool.model.js begin */
 ;(function() {
 
-cool.factory('model', {});
+cool.factory('model', {
+    _params: function(params) {
+        var res = {};
+
+        xtnd.each(this.params, function(val, key) {
+            if (key in params) {
+                res[key] = params[key];
+            } else if (val === null) {
+                res = null;
+                return false;
+            } else if (val !== undefined) {
+                res[key] = val;
+            }
+        });
+
+        return res;
+    }
+});
+
+cool.model._cache = {};
 
 cool.method(cool.model.prototype, {
 

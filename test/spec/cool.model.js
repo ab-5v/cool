@@ -113,4 +113,69 @@ describe('cool.model', function() {
 
     });
 
+    describe('_params', function() {
+
+        beforeEach(function() {
+            this.model = new cool.model();
+            this.model.url = '/test';
+        });
+
+        it('should return null on required absense', function() {
+            this.model.params = {req: null};
+
+            expect( this.model._params({}) )
+                .to.eql( null );
+        });
+
+        it('should return defaults', function() {
+            this.model.params = {def: 40};
+
+            expect( this.model._params({}) )
+                .to.eql( {def: 40} );
+        });
+
+        it('should skip undefineds', function() {
+            this.model.params = {def: 40, foo: undefined};
+
+            expect( this.model._params({}) )
+                .to.eql( {def: 40} );
+        });
+
+        it('should extend defaults', function() {
+            this.model.params = {def: 40, foo: undefined};
+
+            expect( this.model._params({foo: 50}) )
+                .to.eql( {def: 40, foo: 50} );
+        });
+
+        it('should owerwite listed', function() {
+            this.model.params = {def: 10, req: null, ext: undefined};
+
+            expect( this.model._params({def: 30, req: 20, ext: 10}) )
+                .to.eql( {def: 30, req: 20, ext: 10} );
+        });
+
+        it('should owerwrite with \'\'', function() {
+            this.model.params = {def: 20};
+
+            expect( this.model._params({def: ''}) )
+                .to.eql( {def: ''} );
+        });
+
+        it('should owerwrite with 0', function() {
+            this.model.params = {def: 20};
+
+            expect( this.model._params({def: 0}) )
+                .to.eql( {def: 0} );
+        });
+
+        it('should skip not listed', function() {
+            this.model.params = {def: 10};
+
+            expect( this.model._params({foo: 50}) )
+                .to.eql( {def: 10} );
+        });
+
+    });
+
 });
