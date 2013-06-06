@@ -1087,6 +1087,26 @@ cool.factory('model', {
         } else {
             return this._cache[key];
         }
+    },
+
+    /**
+     * Creates $.ajax() request,
+     * aborts previous requests,
+     * stores created request
+     *
+     * @param {Object} options
+     *
+     * @returns Object
+     */
+    request: function(options) {
+        if (this._request) {
+            this._request.abort();
+        }
+
+        this._request = $.ajax(options)
+            .always(function() { this._request = undefined; });
+
+        return this._request;
     }
 });
 

@@ -250,4 +250,36 @@ describe('cool.model', function() {
         });
     });
 
+    describe('request', function() {
+
+        beforeEach(function() { sinon.spy($, 'ajax'); });
+        afterEach(function() { $.ajax.restore(); });
+
+        it('should abort existing request', function() {
+            var abort = sinon.spy();
+
+            this.model._request = { abort: abort };
+            this.model.request();
+
+            expect( abort.calledOnce ).to.be.ok();
+        });
+
+        it('should pass option to $.ajax()', function() {
+            this.model.request({a: 1});
+
+            expect( $.ajax.calledWith({a: 1}) ).to.be.ok();
+        });
+
+        it('should save request object', function() {
+
+            expect( this.model.request() )
+                .to.eql( this.model._request );
+        });
+
+        it('should return $.ajax() object', function() {
+            expect( this.model.request() ).to.be.an( Object );
+        });
+
+    });
+
 });
