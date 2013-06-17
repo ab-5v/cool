@@ -1134,6 +1134,9 @@ cool.factory('model', {
         }
 
         this.request(options)
+            .fail(function(xhr, status) {
+                this.emit(status + 'ed', xhr);
+            })
             .done(function(data) {
                 this.cache(params, data);
 

@@ -1,6 +1,9 @@
 describe('cool.model', function() {
 
     beforeEach(function() {
+        var ctype = { 'Content-Type': 'application/json' };
+        var resp = '{ "user": "artjock" }';
+
         this.model = new cool.model();
         this.model.url = '/test';
         this.model.name = 'test';
@@ -12,10 +15,11 @@ describe('cool.model', function() {
         this.xhr.onCreate = function (xhr) {
             requests.push(xhr);
             setTimeout(function() {
-                xhr.respond(200,
-                    { 'Content-Type': 'application/json' },
-                    '{ "user": "artjock" }'
-                );
+                if (xhr.url == '/test') {
+                    xhr.respond(200, ctype, resp);
+                } else {
+                    xhr.respond(500, ctype);
+                }
             }, 10);
         };
     });
@@ -298,6 +302,22 @@ describe('cool.model', function() {
             this.model.sync();
 
             expect( this.requests[0].method ).to.eql( 'GET' );
+        });
+
+        it('should emit `aborted` on abort', function(done) {
+            this.model.on('aborted', function() {
+                done();
+            });
+            this.model.sync();
+            this.model.sync();
+        });
+
+        it('should emit `errored` on error', function(done) {
+            this.model.url = '/error';
+            this.model.on('errored', function() {
+                done();
+            });
+            this.model.sync();
         });
 
     });
