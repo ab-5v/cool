@@ -666,19 +666,26 @@ var events = {
             if (!(/view|model/).test(info.kind)) { return; }
 
             var store = cool[info.kind]._insts || {};
+            var master = info.master;
 
-            if (info.master === 'this') {
+            if (master === 'this' || master === '*') {
                 // bind event only for current view
                 view.on(info.type, info.listener, info.slave);
-            } else {
+            }
+
+            if (master !== 'this') {
+
+                store = master !== '*' ? store[master] :
+                    [].concat.apply([], xtnd.values(store));
 
                 // bind current event to existing views and models
-                xtnd.each(store[info.master], function(inst) {
+                xtnd.each(store, function(inst) {
                     inst.on(info.type, info.listener, info.slave);
                 });
 
                 that.store(view, info);
             }
+
         });
     },
 
@@ -714,6 +721,10 @@ var events = {
         var queue = cool[kind]._events;
 
         xtnd.each(queue[ inst.name ], function(evt) {
+            inst.on(evt.type, evt.listener, evt.slave);
+        });
+
+        xtnd.each(queue[ '*' ], function(evt) {
             inst.on(evt.type, evt.listener, evt.slave);
         });
     },

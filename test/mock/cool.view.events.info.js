@@ -38,11 +38,25 @@ root.cool_view_events_info = {
         master: 'model',
         context: ''
     },
+    '* -> aborted': {
+        kind: 'model',
+        type: 'aborted',
+        slave: '',
+        master: '*',
+        context: ''
+    },
     'append': {
         kind: 'view',
         type: 'append',
         slave: '*',
         master: 'this',
+        context: ''
+    },
+    '* -> append': {
+        kind: 'view',
+        type: 'append',
+        slave: '*',
+        master: '*',
         context: ''
     },
     'append subview': {

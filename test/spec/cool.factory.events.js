@@ -142,6 +142,11 @@ describe('cool.factory.events', function() {
                 listener: sinon.spy()
             };
 
+            this.es = {
+                kind: 'view', type: 'append', slave: '*', master: '*',
+                listener: sinon.spy()
+            };
+
             sinon.spy(events, 'store');
             sinon.spy(this.view, 'on');
         });
@@ -180,6 +185,18 @@ describe('cool.factory.events', function() {
                 ]);
         });
 
+        it('should bind `*` events immediately', function() {
+            events.on(this.view, [this.es]);
+
+            expect( this.view.on.calledOnce ).to.be.ok();
+            expect( this.view.on.getCall(0).args )
+                .to.be.eql([
+                    'append',
+                    this.es.listener,
+                    '*'
+                ]);
+        });
+
         it('should add event to queue', function() {
             events.on(this.view, [this.ev]);
 
@@ -200,6 +217,22 @@ describe('cool.factory.events', function() {
                     this.ev.listener,
                     'subview'
                 ]);
+        });
+
+        it('should processs all existing views with `*` event', function() {
+            var s1 = sinon.spy();
+            var s2 = sinon.spy();
+            var s3 = sinon.spy();
+
+            cool.view._insts = {
+                v1: [ {on: s1}, {on: s2} ],
+                v2: [ {on: s3} ]
+            };
+            events.on(this.view, [this.es]);
+
+            expect( s1.calledOnce ).to.be.ok();
+            expect( s2.calledOnce ).to.be.ok();
+            expect( s3.calledOnce ).to.be.ok();
         });
 
         it('should process existing models', function() {
@@ -281,6 +314,20 @@ describe('cool.factory.events', function() {
                 events.restore(view, 'view');
 
                 expect( view.on.called ).not.to.be.ok();
+            });
+
+            it('should process `*` events', function() {
+                var view = {name: 'ev', on: sinon.spy(), context: {}};
+                cool.view._events['*'] = [ this.es ];
+                events.restore(view, 'view');
+
+                expect( view.on.calledOnce ).to.be.ok();
+                expect( view.on.getCall(0).args )
+                    .to.eql( [
+                        'append',
+                        this.es.listener,
+                        '*'
+                    ]);
             });
 
         });
