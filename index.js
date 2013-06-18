@@ -1203,6 +1203,8 @@ cool.model.EVENTS = xtnd.hash([
     'errored',
     'fetch',
     'fetched',
+    'create',
+    'createed',
     'init',
     'inited'
 ]);
