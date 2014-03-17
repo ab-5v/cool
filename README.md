@@ -21,8 +21,19 @@ make
 
 #### Tests
 
+To hint you code and run test execute:
 ```
 make test
+```
+
+To run only tests:
+```
+npm test
+```
+
+During development procces, you can watch your code and run test automatically:
+```
+npm start
 ```
 
 #### Tests Coverage
