@@ -1,6 +1,9 @@
 cool [![Build Status](https://api.travis-ci.org/artjock/cool.png?branch=master)](https://travis-ci.org/artjock/cool)
 ====
 
+Event driven framework for quick prototyping.
+
+
 ### Usage
 
 ```bash
@@ -13,6 +16,44 @@ bower install cool
 <script src="./components/pzero/pzero.js"></script>
 <script src="./components/cool/index.js"></script>
 ```
+
+### API
+
+#### Method
+
+```js
+cool.method(name, method, silent);
+//or
+cool.method(dest, methods);
+```
+
+Most of cool component's methods are build with `cool.method`. That what makes `cool` so event driven. `cool.method` produces an method and adds pre- and post- execution events. The name of the pre-event is the same as method name, and post-event has 'ed' postfix. In the pre-event you can cancel action execution or delay it. If action returns 'A+ promise', then the post-event will be called only after promise resolution.
+
+Example:
+
+```js
+cool.method(coolObj, {
+  shout: function() {
+    alert('Hi all');
+  }
+});
+
+coolObj.on('shout', function(evt) {
+  if (window.sleepy) { evt.prevetDefault(); }
+  if (window.wait) {
+    setTimeout(function() { evt.action(); }, 1000);
+  }
+});
+
+coolObj.on('shouted', function() {
+  alert('Hi');
+});
+```
+
+#### Store
+#### Events
+#### View
+#### Model
 
 ### Development
 
