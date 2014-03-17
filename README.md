@@ -1,4 +1,4 @@
-cool [![Build Status](https://travis-ci.org/artjock/cool.png?branch=master)](https://travis-ci.org/artjock/cool)
+cool [![Build Status](https://api.travis-ci.org/artjock/cool.png?branch=master)](https://travis-ci.org/artjock/cool)
 ====
 
 ### Usage
