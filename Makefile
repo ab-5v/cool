@@ -14,11 +14,11 @@ test-cov: index-cov
 index-cov: $(OUTPUT) clean-index-cov
 	mkdir -p index
 	cp $(OUTPUT) index
-	jscoverage --no-highlight index index-cov
+	$(NBIN)/jscoverage --no-highlight index index-cov
 
 clean-index-cov:
 	rm -rf index index-cov
-	rm coverage.html
+	rm -f coverage.html
 
 clean: clean-index-cov
 	rm -rf node_modules

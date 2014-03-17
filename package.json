@@ -26,7 +26,8 @@
         "nodemon": "*",
         "jshint": "*",
         "bower": "*",
-        "json2htmlcov": "*"
+        "json2htmlcov": "*",
+        "jscoverage": "*"
     },
     "private": true
 }
