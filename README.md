@@ -29,12 +29,12 @@ To hint you code and run test execute:
 make test
 ```
 
-To run only tests:
+To run tests only:
 ```
 npm test
 ```
 
-During development procces, you can watch your code and run test automatically:
+During development procces, you can watch your code and run tests automatically:
 ```
 npm start
 ```
@@ -45,4 +45,4 @@ npm start
 make test-cov
 ```
 
-It will generate `coverage.html`, you can browse it in your browser
+It will generate `coverage.html`, you can open it in your browser
