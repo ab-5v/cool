@@ -8,7 +8,10 @@ bower install cool
 ```
 
 ```html
-<script src="./cool.js"></script>
+<script src="./components/jquery/dist/jquery.js"></script>
+<script src="./components/xtend/index.js"></script>
+<script src="./components/pzero/pzero.js"></script>
+<script src="./components/cool/index.js"></script>
 ```
 
 ### Development
