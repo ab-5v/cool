@@ -1,7 +1,6 @@
 ;(function(root) {
 
-/* jshint -W106 */
-root.cool_view_events_info = {
+root.coolViewEventsInfo = {
 
     'click': {
         kind: 'dom',

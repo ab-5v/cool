@@ -4,9 +4,8 @@ describe('cool.factory.events', function() {
 
     describe('info', function() {
 
-        /* global cool_view_events_info */
-        /* jshint -W106 */
-        xtnd.each(cool_view_events_info, function(res, desc) {
+        /* global coolViewEventsInfo */
+        xtnd.each(coolViewEventsInfo, function(res, desc) {
 
             it('should parse "' + desc + '"', function() {
 
