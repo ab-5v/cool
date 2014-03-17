@@ -51,6 +51,25 @@ coolObj.on('shouted', function() {
 ```
 
 #### Store
+
+```js
+xtnd(coolObj, cool.store('data'));
+```
+
+Creates data getter/setter with specified name. Every modification generates modification log '{before: { ... }, after: { ... }}'.
+
+```js
+coolObj.data()                    // returns whole object
+coolObj.data(name)                // returns property 'name'
+coolObj.data(name, value)         // setups property 'name'
+coolObj.data({})                  // setups the whole object
+coolObj.data(true, {})            // extends object
+coolObj.data(true, name, value)   // extends adds 'value' to 'name' (push to array)
+coolObj.data(false)               // empties whole data
+coolObj.data(false, name)         // removes property 'name'
+coolObj.data(false, name, value)  // removes 'value' from 'name'
+```
+
 #### Events
 #### View
 #### Model
