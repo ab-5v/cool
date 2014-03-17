@@ -18,8 +18,8 @@
     },
     "devDependencies": {
         "mocha": "1.8.x",
-        "sinon": "*",
-        "expect.js": "*",
+        "sinon": "1.7.3",
+        "expect.js": "0.3.1",
         "borschik": "*",
         "phantomjs": "*",
         "mocha-phantomjs": "*",
