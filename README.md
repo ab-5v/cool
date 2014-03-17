@@ -56,7 +56,7 @@ coolObj.on('shouted', function() {
 xtnd(coolObj, cool.store('data'));
 ```
 
-Creates data getter/setter with specified name. Every modification generates modification log '{before: { ... }, after: { ... }}'.
+Creates data getter/setter with specified name. Every modification generates modification log `{before: { ... }, after: { ... }}`.
 
 ```js
 coolObj.data()                    // returns whole object
