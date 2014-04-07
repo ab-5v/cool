@@ -71,6 +71,50 @@ coolObj.data(false, name, value)  // removes 'value' from 'name'
 ```
 
 #### Events
+
+You can subscribe to events from your `cool` instances in a declarative way:
+
+```js
+events: {
+    'master -> type slave': function() {}
+}
+```
+Where master (subject) could be the name of instance, generated event and slave (object) is a name of instance master is manipulated on. For example:
+```js
+events: {
+    'library -> append photo': 'onPhotoAppend'
+}
+```
+Will be fired, when someone will do `library.append(photo)`
+
+You can subscribe to events of the current instance only:
+```js
+events: {
+    'this -> append user'
+}
+```
+
+You can subscribe to every master and every slave of specified event:
+```js
+events: {
+    '* -> append'
+}
+```
+
+You can also subscribe to model's events:
+```js
+events: {
+    'users -> fetched': 'onload'
+}
+```
+
+You can also subscribe to DOM events:
+```js
+events: {
+    '.b-button -> click': 'onsubmit'
+}
+```
+
 #### View
 #### Model
 
