@@ -90,7 +90,8 @@ Will be fired, when someone will do `library.append(photo)`
 You can subscribe to events of the current instance only:
 ```js
 events: {
-    'this -> append user'
+    'this -> append user': 'handler',
+    'append user': 'handler' // the same
 }
 ```
 
@@ -116,6 +117,54 @@ events: {
 ```
 
 #### View
+
+##### Defenition
+```js
+cool.view({
+    name: 'users',
+    events: {
+        'master -> type slave': 'handler'
+    },
+    views: ['store', 'search'] // this views will be rendered first
+    models: ['users'] // current view will be rendered only after this model resolution
+});
+
+Each model will have event's methods (`on`, `off`, `emit`, `one`) and two `stores` `data` and `param`. `data` contains model's responses and `param` contains model's params.
+
+##### Methods
+
+
+`toJSON` - will return object with `data` and `param` values.
+
+`html(json)` - renders html string from JSON, should be overwritten depending on your favorite template engine. Example for yate:
+```js
+cool.view.prototype.html = function(json) {
+    return yr.run('main', json, 'cool-' + this.name);
+};
+```
+
+`find(name|instance)` - will return first matched subview, by name or by instance reference
+
+`render()` - genereates html after all all submodels and sub views are resolved.
+
+`append(view)` - will add view to the current one. You can subscribe to append event and hack `operation` to specify where exactly to append subview:
+```js
+cool.view({
+    name: 'users',
+    events: {
+        'append user': function(evt) {
+            evt.operation.root = '.js-users-store';
+        }
+    }
+});
+```
+
+`detach(skipDome)` - detaches view from parent view and from dome (if !skipDome)
+
+`remove` - removes view, detaches it from everywhere
+
+`empty` - removes every subview from the current one
+
 #### Model
 
 ### Development
